@@ -73,8 +73,12 @@ Die Kategorienamen sind über `products_nonsingles_6.json` bestätigt, siehe `08
 - Rohdatei täglich archivieren (15 MB, ~5,5 GB/Jahr unkomprimiert, gzip ~1,5 GB) → Storage-Kosten vernachlässigbar.
 - Pro Tag ~78k Zeilen × 2 Varianten in `price_snapshots`, ~57 Mio Zeilen/Jahr → Partitionierung nach Monat von Anfang an, `null`-Varianten nicht speichern.
 
+## Zubehör-Datei (`price_guide_accessories.json`)
+
+Auf der Data-Seite gibt es neben dem Pokémon-Price-Guide nur noch diese spielübergreifende Zubehör-Datei (geprüft 2026-09-04): 18.967 Produkte (Sleeves, Binder, Deckboxen, Playmats usw.) in 15 Kategorien, gleiche Struktur, Variantenfelder heißen hier `*-foil` statt `*-holo`. Kein Produktkatalog dazu auf der Data-Seite, also ohne Namen. **Für uns nicht relevant**, höchstens später für Zubehör-Ausgaben im Investment-Tracking.
+
 ## Offen
 
-1. Nutzungsbedingungen der Data-Seite (Attribution, kommerzielle Nutzung).
+Keine offenen Punkte mehr zur Datei. Die Data-Seite enthält laut Sichtung nur Price Guide, Zubehör-Datei und Links zu anderen TCGs, keine eigenen Nutzungshinweise.
 
 Produktkataloge sind geprüft, siehe `08-id-mapping.md` (Kategorienamen, Namensmuster, Mapping-Strategie).
