@@ -31,8 +31,8 @@ Ziel: Repo, Infrastruktur und der tägliche Preis-Snapshot laufen. **Ab M0 samme
 | Monorepo aufsetzen (pnpm, Turborepo, ESLint, Prettier, TS strict, Vitest) | Dev A | `pnpm lint/test/typecheck` grün |
 | Supabase-Projekt (EU) + lokales Setup (`supabase start`) + Migrations-Workflow | Dev B | erste Migration gemerged |
 | `packages/db`: Schema `cards`, `sets`, `price_snapshots`, `fx_rates` | Dev B | Migration + Drizzle-Typen |
-| Cardmarket-Data-Seite auf eigene Nutzungshinweise prüfen und **schriftliche Zustimmung zur Preisanzeige anfragen** (`09-cardmarket-anfrage.md`) | Dev A | Anfrage gesendet, Antwort in `02` dokumentiert; Release-Blocker bis Antwort |
-| `apps/worker`: TCGdex-Katalog-Import (alle Sprachen) + Cardmarket-Produktkatalog-Import | Dev B | ~20k Karten + Cardmarket-Produkte in DB |
+| Cardmarket-Quellenangabe und Link-Konvention festlegen (Attribution in Kartendetail, Portfolio, Store-Text) | Dev A | Konvention in `packages/ui` dokumentiert |
+| `apps/worker`: Katalog-Import aus dem TCGdex-Datenbank-Clone (alle Sprachen, `thirdParty`-IDs, Attacken) + Cardmarket-Produktkatalog-Import | Dev B | ~42k Karten + 78k Cardmarket-Produkte in DB |
 | `apps/worker`: ID-Mapping Cardmarket ↔ TCGdex nach Pipeline in `08-id-mapping.md` (TCGdex-Seed, Expansion-Tabelle, Name+Attacken, Reihenfolge), Abdeckung messen | Dev B | ≥ 90 % der Karten mit Trend ≥ 5 € gemappt, Rest in Review-Tabelle |
 | Manuelle Kuratierung `cardmarket_expansions` (774 Zeilen, Sprache + TCGdex-Set) | Dev A | Tabelle vollständig |
 | `apps/worker`: täglicher Preis-Snapshot-Job (Cardmarket-Download + TCGdex) + Rohdatei-Archiv + FX-Job, Deploy auf Fly.io, Alerting bei Fehlschlag | Dev B | Cron läuft in Prod |

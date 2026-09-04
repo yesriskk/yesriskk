@@ -134,12 +134,12 @@ Frame → Karten-Detektion (Rechteck, 63×88 mm Ratio) → Perspektiv-Korrektur 
 
 ```ts
 interface PriceProvider {
-  id: 'cardmarket' | 'tcgdex' | 'pricecharting' | 'scrydex' | 'manual';
+  id: 'cardmarket' | 'tcgplayer' | 'pricecharting' | 'scrydex' | 'manual';
   fetchBatch(cardIds: string[]): Promise<PricePoint[]>;
 }
 ```
 
-Der `cardmarket`-Provider lädt die öffentliche Price-Guide-Datei (kein API-Key) und löst `idProduct` über `card_external_ids` auf. Worker orchestriert Provider, schreibt Snapshots, berechnet daraus:
+Der `cardmarket`-Provider lädt die öffentliche Price-Guide-Datei (kein API-Key) und löst `idProduct` über `card_external_ids` auf; `tcgplayer` (USD) kommt über TCGdex. TCGdex' eigene Cardmarket-Preise sind dieselbe Datei und werden nicht genutzt (`10-vergleich-cardmarket-tcgdex.md`). Worker orchestriert Provider, schreibt Snapshots, berechnet daraus:
 - `card_price_current` (Materialized View: letzter Snapshot pro Karte/Variante/Quelle),
 - `card_price_change` (Δ 24h/7d/30d/90d),
 - Portfolio-Snapshots pro Nutzer,

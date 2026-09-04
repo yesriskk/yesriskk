@@ -7,8 +7,8 @@ Stand der Recherche: September 2026. Bitte vor Phase 0 nochmal gegenprüfen, API
 | Bedarf | Empfehlung | Kosten | Status |
 |---|---|---|---|
 | Karten-Katalog + Bilder (mehrsprachig) | **TCGdex** | kostenlos, Open Source | ✅ primär |
-| Aktuelle Preise EUR (Cardmarket) | **Cardmarket Price Guide Download** (offizielle Tagesdatei, ohne API) | kostenlos | ✅ primär |
-| Preise USD (TCGplayer) + EUR-Fallback | **TCGdex `pricing`-Feld** | kostenlos | ✅ sekundär |
+| Aktuelle Preise EUR (Cardmarket), pro Sprache | **Cardmarket Price Guide Download** (offizielle Tagesdatei, ohne API) | kostenlos | ✅ einzige EUR-Quelle |
+| Preise USD (TCGplayer) | **TCGdex `pricing.tcgplayer`** | kostenlos | ✅ |
 | Sealed-Preise EUR | **Cardmarket Produktkatalog `nonsingles` + Price Guide** | kostenlos | ✅ Phase 3 |
 | Preis-Historie | **Eigene tägliche Snapshots** | eigene Infrastruktur | ✅ ab Phase 1 |
 | Graded-Preise, Population | **Scrydex** (Growth-Tier) oder **PriceCharting** | ab ~29 $/Monat bzw. Abo | ⏳ Phase 3, Entscheidung offen |
@@ -33,13 +33,9 @@ Was die Dateien **nicht** enthalten: Bilder, lokalisierte Namen, Kartennummer, S
 
 **Verifiziert am 2026-09-04** anhand einer echten `price_guide_6.json`: Struktur, Felder und Datenqualität stehen in `07-cardmarket-price-guide.md`. Kurz: 78.243 Produkte, davon 73.195 Einzelkarten, Preise als `avg/low/trend/avg1/avg7/avg30` plus Reverse-Holo-Spiegel `*-holo`, Erzeugung täglich ~02:45 MESZ.
 
-**Rechtlicher Status der Download-Dateien (Stand 2026-09-04, siehe Abschnitt 8a):** Die Dateien sind für alle Nutzer frei herunterladbar. Die Cardmarket-AGB enthalten aber für die API eine Klausel, nach der die *Darstellung von Karten und Preisen* eine vorherige schriftliche Zustimmung erfordert. Ob diese Klausel auch die Download-Dateien erfasst, ist offen. **Vor einem öffentlichen Release holen wir eine schriftliche Zustimmung von Cardmarket ein** (Entwurf in `docs/09-cardmarket-anfrage.md`). Interne Entwicklung und Snapshot-Sammlung sind davon nicht blockiert.
+**Rechtlicher Status der Download-Dateien (Entscheidung vom 2026-09-04):** Die Dateien sind öffentlich und ohne Login für jeden abrufbar. Die AGB-Klausel zur schriftlichen Zustimmung steht im API-Abschnitt und bezieht sich auf die API und ihre Endpunkte (z. B. Listings anlegen); die Data-Seite verweist nicht auf diese Klausel. Wir nutzen die Download-Dateien daher für die App. Die Anfrage in `09-cardmarket-anfrage.md` bleibt als Option für später (z. B. vor einem Pro-Abo oder bei Nachfrage von Cardmarket), ist aber kein Release-Blocker. Cardmarket wird in der App als Quelle genannt und verlinkt.
 
-**Vor Phase 0 noch prüfen (von einem Rechner mit Zugriff auf cardmarket.com):**
-1. Steht auf der Data-Seite ein eigener Nutzungshinweis oder ein Verweis auf die AGB? Text oder Screenshot in `08a` unten ablegen.
-2. Anfrage an Cardmarket absenden (siehe `09`).
-
-**Konsequenz:** Der Cardmarket-Download wird Provider Nr. 1 für EUR-Preise, direkt von der Quelle, inklusive Sealed. TCGdex bleibt Katalog-, Bild- und USD-Quelle sowie EUR-Fallback. Das Preis-Modul bleibt quellenneutral (`price_source`-Spalte).
+**Konsequenz:** Der Cardmarket-Download ist die einzige EUR-Preisquelle, direkt von Cardmarket, sprachgetrennt und inklusive Sealed. TCGdex ist Katalog-, Bild- und USD-Quelle; seine Cardmarket-Preise sind nachweislich dieselbe Datei und werden nicht verwendet (Details in `10-vergleich-cardmarket-tcgdex.md`). Das Preis-Modul bleibt quellenneutral (`price_source`-Spalte).
 
 **Mapping Cardmarket `idProduct` ↔ TCGdex `card_id`:** Die Produktnamen enthalten **keine** Kartennummer (Muster `Name [Attacke | Attacke]`). Der Hauptweg ist deshalb das Feld `thirdParty.cardmarket`, das TCGdex in seiner Open-Source-Datenbank pflegt (deckt 40,7 % der Singles ab), ergänzt um Name-plus-Attacken-Matching und die Beobachtung, dass die `idProduct`-Reihenfolge in 95 % der Fälle der Kartennummer folgt. Details, Zahlen und Pipeline in `08-id-mapping.md`.
 
@@ -111,7 +107,7 @@ Aus der News-Ankündigung zu den Downloads: Price Guide und Produktkatalog sind 
 - Die AGB-Klausel bezieht sich wörtlich auf die API. Cardmarket hat die Dateien aber genau als Ersatz für diese API-Endpunkte veröffentlicht; es ist plausibel, dass Cardmarket dieselbe Erwartung an die Nutzung hat.
 - Unabhängig von den AGB gilt in der EU das **Datenbankherstellerrecht** (§§ 87a ff. UrhG, Datenbank-Richtlinie 96/9/EG): Die tägliche Entnahme des gesamten Price Guides ist eine Entnahme eines "wesentlichen Teils" und braucht eine Erlaubnis. Das öffentliche Anbieten zum Download ist ein starkes Indiz für eine konkludente Erlaubnis zum Herunterladen, sagt aber nichts über die Weiterverbreitung in einer App.
 - Marktpraxis: Mehrere Sammler-Apps zeigen "Cardmarket-Preise" an. Ob mit schriftlicher Vereinbarung, ist von außen nicht erkennbar.
-- **Konsequenz:** Wir behandeln die Anzeige von Cardmarket-Preisen in der App als zustimmungspflichtig, bis Cardmarket schriftlich etwas anderes sagt. Bis dahin: entwickeln, Snapshots sammeln, nicht veröffentlichen. Bei Ablehnung: TCGdex-Preise anzeigen (TCGdex trägt dann das Quellenrisiko) oder auf Bezahl-APIs ausweichen; die eigene Historie bleibt erhalten, weil sie gegen `idProduct` gespeichert ist.
+- **Entscheidung des Teams (2026-09-04):** Die Klausel gilt für die API und ihre Endpunkte, nicht für die öffentlich abrufbaren Download-Dateien. Wir nutzen die Dateien, nennen Cardmarket als Quelle und verlinken auf die Produktseiten. Die Anfrage (`09`) bleibt optional. Sollte Cardmarket sich melden, ist der Fallback TCGdex-Anzeige oder Bezahl-API; die Historie bleibt erhalten, weil sie gegen `idProduct` gespeichert ist.
 
 ## 8. Rechtliches
 

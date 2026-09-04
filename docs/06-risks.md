@@ -16,7 +16,7 @@
 | Risiko | Wahrscheinlichkeit | Auswirkung | Gegenmaßnahme |
 |---|---|---|---|
 | **TCGdex ändert Preisfeld oder fällt aus** | mittel | hoch | Provider-Abstraktion; Self-Hosting-Option von TCGdex (Open Source); Fallback-Provider evaluieren; eigene Snapshots bleiben erhalten |
-| **Cardmarket verweigert die schriftliche Zustimmung zur Preisanzeige** (AGB: "presentation of … prices require prior written agreement") | mittel | hoch | Anfrage früh stellen (`09-cardmarket-anfrage.md`); bis zur Antwort nicht veröffentlichen; Fallback TCGdex-Preise oder Bezahl-API; Historie bleibt, weil gegen `idProduct` gespeichert |
+| **Cardmarket widerspricht später der Nutzung der Download-Dateien** (AGB-Klausel gilt nach unserer Lesart nur für die API) | niedrig | hoch | Quelle nennen und verlinken; Anfrage-Entwurf (`09`) bereithalten; Fallback Bezahl-API; Historie bleibt, weil gegen `idProduct` gespeichert |
 | **Cardmarket stellt die offenen Price-Guide-Downloads ein oder ändert die Bedingungen** | niedrig-mittel | hoch | Rohdateien archivieren; TCGdex als Fallback-Provider fertig halten; kein Scraping |
 | **ID-Mapping Cardmarket ↔ TCGdex unvollständig** (Promos, JP-Karten, Varianten) | hoch | mittel | Automatik + Review-Tabelle, Abdeckung als Metrik im Worker, TCGdex `variants_detailed` beobachten |
 | **Scanner-Trefferquote unter 95 %** (Glanz, Beleuchtung, Reverse Holo, JP-Karten) | mittel | hoch | Früh Feldtest (Phase 2), Review-Queue als Sicherheitsnetz, OCR-Tiebreaker, später Embedding-Fallback |
