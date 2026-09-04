@@ -30,7 +30,7 @@ Planungsphase. Es gibt noch keinen Code. Lies vor jeder Arbeit:
 
 ## Verboten
 
-- Scraping von cardmarket.com, ebay.com oder anderen Marktplätzen.
+- Scraping von cardmarket.com, ebay.com oder anderen Marktplätzen. Erlaubt sind nur die offiziellen Cardmarket-Download-Dateien (Price Guide, Produktkatalog).
 - Offizielle Pokémon-Logos/Wordmarks/Artworks als App-Assets (Kartenbilder kommen von TCGdex per URL).
 - `git push --force` auf `main` oder auf Branches anderer.
 - Migrationen mit Sequenznummern statt Timestamp.

@@ -58,6 +58,7 @@ flowchart LR
     HTTP[Hono API: Match-Fallback, eBay, Reports]
   end
   TCGdex[(TCGdex API)]
+  CM[(Cardmarket Price Guide Download)]
   Graded[(Scrydex / PriceCharting)]
   eBay[(eBay Sell APIs)]
   App <--> PG
@@ -65,6 +66,7 @@ flowchart LR
   App <--> Store
   App --> HTTP
   Cron --> TCGdex
+  Cron --> CM
   Cron --> Graded
   Cron --> PG
   HTTP --> eBay
@@ -79,6 +81,8 @@ sets                 (id, series, name_by_lang, total, printed_total, released_o
 price_snapshots      (card_id, variant, source, currency, captured_on, avg, low, trend, avg1, avg7, avg30)  -- partitioniert nach Monat
 graded_price_snapshots (card_id, grader, grade, source, currency, captured_on, price)
 fx_rates             (date, base, quote, rate)
+card_external_ids    (card_id, source, external_id, confidence, verified_by)  -- z. B. Cardmarket idProduct
+cardmarket_products  (id_product, name, id_expansion, id_metacard, is_single, date_added)  -- Rohkatalog
 
 users                (Supabase auth)
 collection_items     (id, user_id, card_id, variant, language, condition, quantity, is_graded, grader, grade, cert_no,
@@ -130,12 +134,12 @@ Frame → Karten-Detektion (Rechteck, 63×88 mm Ratio) → Perspektiv-Korrektur 
 
 ```ts
 interface PriceProvider {
-  id: 'tcgdex' | 'pricecharting' | 'scrydex' | 'manual';
+  id: 'cardmarket' | 'tcgdex' | 'pricecharting' | 'scrydex' | 'manual';
   fetchBatch(cardIds: string[]): Promise<PricePoint[]>;
 }
 ```
 
-Worker orchestriert Provider, schreibt Snapshots, berechnet daraus:
+Der `cardmarket`-Provider lädt die öffentliche Price-Guide-Datei (kein API-Key) und löst `idProduct` über `card_external_ids` auf. Worker orchestriert Provider, schreibt Snapshots, berechnet daraus:
 - `card_price_current` (Materialized View: letzter Snapshot pro Karte/Variante/Quelle),
 - `card_price_change` (Δ 24h/7d/30d/90d),
 - Portfolio-Snapshots pro Nutzer,

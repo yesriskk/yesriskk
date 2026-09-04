@@ -16,7 +16,8 @@
 | Risiko | Wahrscheinlichkeit | Auswirkung | Gegenmaßnahme |
 |---|---|---|---|
 | **TCGdex ändert Preisfeld oder fällt aus** | mittel | hoch | Provider-Abstraktion; Self-Hosting-Option von TCGdex (Open Source); Fallback-Provider evaluieren; eigene Snapshots bleiben erhalten |
-| **Cardmarket-Preise sind nur indirekt verfügbar** | sicher | mittel | Ehrlich als "Cardmarket-Referenzpreis (via TCGdex)" labeln; kein Scraping |
+| **Cardmarket stellt die offenen Price-Guide-Downloads ein oder ändert die Bedingungen** | niedrig-mittel | hoch | Rohdateien archivieren; TCGdex als Fallback-Provider fertig halten; Nutzungsbedingungen vor Phase 0 dokumentieren; kein Scraping |
+| **ID-Mapping Cardmarket ↔ TCGdex unvollständig** (Promos, JP-Karten, Varianten) | hoch | mittel | Automatik + Review-Tabelle, Abdeckung als Metrik im Worker, TCGdex `variants_detailed` beobachten |
 | **Scanner-Trefferquote unter 95 %** (Glanz, Beleuchtung, Reverse Holo, JP-Karten) | mittel | hoch | Früh Feldtest (Phase 2), Review-Queue als Sicherheitsnetz, OCR-Tiebreaker, später Embedding-Fallback |
 | **Offline-Sync-Bugs** (Duplikate, verlorene Edits) | mittel | hoch | Fertige Sync-Lösung ernsthaft prüfen (ADR-004); Property-based Tests für Merge-Logik |
 | **Bezahl-APIs kosten laufend Geld** (Scrydex 29–99 $/Monat) | sicher | mittel | Erst ab Phase 3, gekoppelt an Monetarisierung (ADR-006); Caching, nur Karten mit Nutzer-Interesse abfragen |

@@ -31,8 +31,10 @@ Ziel: Repo, Infrastruktur und der tägliche Preis-Snapshot laufen. **Ab M0 samme
 | Monorepo aufsetzen (pnpm, Turborepo, ESLint, Prettier, TS strict, Vitest) | Dev A | `pnpm lint/test/typecheck` grün |
 | Supabase-Projekt (EU) + lokales Setup (`supabase start`) + Migrations-Workflow | Dev B | erste Migration gemerged |
 | `packages/db`: Schema `cards`, `sets`, `price_snapshots`, `fx_rates` | Dev B | Migration + Drizzle-Typen |
-| `apps/worker`: TCGdex-Katalog-Import (alle Sprachen) | Dev B | ~20k Karten in DB |
-| `apps/worker`: täglicher Preis-Snapshot-Job + FX-Job, Deploy auf Fly.io, Alerting bei Fehlschlag | Dev B | Cron läuft in Prod |
+| Cardmarket-Data-Seite prüfen: URLs, Felder, Nutzungsbedingungen, Update-Uhrzeit (siehe `02-data-sources.md`) | Dev B | Notiz in `02-data-sources.md` |
+| `apps/worker`: TCGdex-Katalog-Import (alle Sprachen) + Cardmarket-Produktkatalog-Import | Dev B | ~20k Karten + Cardmarket-Produkte in DB |
+| `apps/worker`: ID-Mapping Cardmarket ↔ TCGdex (Expansion + Nummer aus Produktname), Abdeckung messen | Dev B | ≥ 90 % automatisch gemappt, Rest in Review-Tabelle |
+| `apps/worker`: täglicher Preis-Snapshot-Job (Cardmarket-Download + TCGdex) + Rohdatei-Archiv + FX-Job, Deploy auf Fly.io, Alerting bei Fehlschlag | Dev B | Cron läuft in Prod |
 | Expo-App-Skeleton: Router, Auth-Screens (Supabase), Design-Tokens, Navigation-Grundgerüst | Dev A | App startet, Login funktioniert |
 | CI: Lint/Typecheck/Test auf PR, EAS Preview Build | Dev A | PR-Checks grün |
 | `CLAUDE.md`, `.claude/`-Commands, PR-Template, Issue-Labels | beide | Team-Konventionen live |
@@ -77,7 +79,7 @@ Features: A4, A6, A8, A9, B5, B10, C2, C4, C5, D3, E1, E2, E3, E4 (Zentrierung),
 | Task | Owner | Notizen |
 |---|---|---|
 | Bulk-/Video-Scanner: Stabilitäts-Logik, Auto-Add, Undo, Session-Zusammenfassung | Dev A | |
-| Sealed-Produkte: Katalog (eigene Tabelle + EAN), Erfassung, Preisquelle (PriceCharting) | Dev B | |
+| Sealed-Produkte: Katalog aus Cardmarket `nonsingles` (+ EAN manuell), Erfassung, EUR-Preise aus Price Guide, USD optional PriceCharting | Dev B | |
 | Graded-Preise-Provider (PriceCharting oder Scrydex, ADR-003) + `graded_price_snapshots` | Dev B | |
 | Graded-Karten-Erfassung, Cert-Link | Dev A | |
 | Verkäufe erfassen → Realized P&L, ROI, Tags (Kollektion/Investment/Verkauf) | Dev A | |
