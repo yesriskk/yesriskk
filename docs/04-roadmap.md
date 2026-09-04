@@ -33,7 +33,8 @@ Ziel: Repo, Infrastruktur und der tägliche Preis-Snapshot laufen. **Ab M0 samme
 | `packages/db`: Schema `cards`, `sets`, `price_snapshots`, `fx_rates` | Dev B | Migration + Drizzle-Typen |
 | Cardmarket-Data-Seite prüfen: Nutzungsbedingungen, Produktkatalog-Felder (Price-Guide-Schema ist bereits verifiziert, siehe `07-cardmarket-price-guide.md`) | Dev B | Notiz in `07-cardmarket-price-guide.md` |
 | `apps/worker`: TCGdex-Katalog-Import (alle Sprachen) + Cardmarket-Produktkatalog-Import | Dev B | ~20k Karten + Cardmarket-Produkte in DB |
-| `apps/worker`: ID-Mapping Cardmarket ↔ TCGdex (Expansion + Nummer aus Produktname), Abdeckung messen | Dev B | ≥ 90 % automatisch gemappt, Rest in Review-Tabelle |
+| `apps/worker`: ID-Mapping Cardmarket ↔ TCGdex nach Pipeline in `08-id-mapping.md` (TCGdex-Seed, Expansion-Tabelle, Name+Attacken, Reihenfolge), Abdeckung messen | Dev B | ≥ 90 % der Karten mit Trend ≥ 5 € gemappt, Rest in Review-Tabelle |
+| Manuelle Kuratierung `cardmarket_expansions` (774 Zeilen, Sprache + TCGdex-Set) | Dev A | Tabelle vollständig |
 | `apps/worker`: täglicher Preis-Snapshot-Job (Cardmarket-Download + TCGdex) + Rohdatei-Archiv + FX-Job, Deploy auf Fly.io, Alerting bei Fehlschlag | Dev B | Cron läuft in Prod |
 | Expo-App-Skeleton: Router, Auth-Screens (Supabase), Design-Tokens, Navigation-Grundgerüst | Dev A | App startet, Login funktioniert |
 | CI: Lint/Typecheck/Test auf PR, EAS Preview Build | Dev A | PR-Checks grün |

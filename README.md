@@ -16,6 +16,8 @@ Digitale Pokémon-Kartensammlung mit Preisen, Preisentwicklung, Portfolio-Tracki
 | [docs/05-collaboration.md](docs/05-collaboration.md) | Zusammenarbeit zu zweit mit Claude Code: Branching, Ownership, PR-Regeln |
 | [docs/06-risks.md](docs/06-risks.md) | Risiken und offene Entscheidungen |
 | [docs/07-cardmarket-price-guide.md](docs/07-cardmarket-price-guide.md) | Verifiziertes Schema und Datenqualität der Cardmarket-Price-Guide-Datei |
+| [docs/08-id-mapping.md](docs/08-id-mapping.md) | Analyse der Produktkataloge und Mapping-Strategie Cardmarket ↔ TCGdex |
+| [tools/analysis/](tools/analysis/) | Reproduzierbare Analyse-Skripte |
 | [docs/adr/](docs/adr/) | Architecture Decision Records |
 | [CLAUDE.md](CLAUDE.md) | Konventionen, die Claude Code bei beiden Entwicklern automatisch liest |
 

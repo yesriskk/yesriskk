@@ -26,10 +26,10 @@ Stand der Recherche: September 2026. Bitte vor Phase 0 nochmal gegenprüfen, API
 | Datei | Inhalt |
 |---|---|
 | `downloads.s3.cardmarket.com/productCatalog/priceGuide/price_guide_6.json` (auch als CSV) | Täglicher Price Guide (**verifiziert**): pro `idProduct` `avg`, `low`, `trend`, `avg1`, `avg7`, `avg30` sowie dieselben Werte für die Reverse-Holo-Variante als `*-holo`; `avg1/7/30` nur bei Einzelkarten |
-| `downloads.s3.cardmarket.com/productCatalog/productList/products_singles_6.json` | Alle Einzelkarten: `idProduct`, `name`, `idCategory`, `idExpansion`, `idMetacard`, `dateAdded` |
-| `downloads.s3.cardmarket.com/productCatalog/productList/products_nonsingles_6.json` | Alle Sealed-Produkte (Booster, Displays, ETBs, Tins …) |
+| `downloads.s3.cardmarket.com/productCatalog/productList/products_singles_6.json` | Alle Einzelkarten (**verifiziert**, 73.195): `idProduct`, `name`, `idCategory`, `categoryName`, `idExpansion`, `idMetacard`, `dateAdded` |
+| `downloads.s3.cardmarket.com/productCatalog/productList/products_nonsingles_6.json` | Alle Sealed-Produkte (**verifiziert**, 5.048 in 11 Kategorien), gleiche Felder |
 
-Was die Dateien **nicht** enthalten: Bilder, lokalisierte Namen, Kartennummer als eigenes Feld (steckt aber im Produktnamen, z. B. "Charizard ex (OBF 125)"), Preise nach Zustand oder Sprache, Verkaufszahlen, Historie über den 30-Tage-Schnitt hinaus.
+Was die Dateien **nicht** enthalten: Bilder, lokalisierte Namen, Kartennummer, Seltenheit, Expansion-Namen, Preise nach Zustand oder Sprache, Verkaufszahlen, Historie über den 30-Tage-Schnitt hinaus.
 
 **Verifiziert am 2026-09-04** anhand einer echten `price_guide_6.json`: Struktur, Felder und Datenqualität stehen in `07-cardmarket-price-guide.md`. Kurz: 78.243 Produkte, davon 73.195 Einzelkarten, Preise als `avg/low/trend/avg1/avg7/avg30` plus Reverse-Holo-Spiegel `*-holo`, Erzeugung täglich ~02:45 MESZ.
 
@@ -40,7 +40,7 @@ Was die Dateien **nicht** enthalten: Bilder, lokalisierte Namen, Kartennummer al
 
 **Konsequenz:** Der Cardmarket-Download wird Provider Nr. 1 für EUR-Preise, direkt von der Quelle, inklusive Sealed. TCGdex bleibt Katalog-, Bild- und USD-Quelle sowie EUR-Fallback. Das Preis-Modul bleibt quellenneutral (`price_source`-Spalte).
 
-**Mapping Cardmarket `idProduct` ↔ TCGdex `card_id`:** Das ist die eine echte Fleißarbeit. Strategie: Expansion-Zuordnung über `idExpansion` ↔ TCGdex-Set, dann Kartennummer aus dem Cardmarket-Produktnamen parsen und mit der TCGdex-Nummer abgleichen; Rest per Namensähnlichkeit plus manueller Review-Tabelle. TCGdex kündigt ein Feld `variants_detailed` mit direkten Cardmarket-IDs an; sobald das da ist, ersetzt es unser Mapping weitgehend. Das Mapping wird als eigene Tabelle `card_external_ids(card_id, source, external_id, confidence)` versioniert.
+**Mapping Cardmarket `idProduct` ↔ TCGdex `card_id`:** Die Produktnamen enthalten **keine** Kartennummer (Muster `Name [Attacke | Attacke]`). Der Hauptweg ist deshalb das Feld `thirdParty.cardmarket`, das TCGdex in seiner Open-Source-Datenbank pflegt (deckt 40,7 % der Singles ab), ergänzt um Name-plus-Attacken-Matching und die Beobachtung, dass die `idProduct`-Reihenfolge in 95 % der Fälle der Kartennummer folgt. Details, Zahlen und Pipeline in `08-id-mapping.md`.
 
 ## 2. TCGdex (Katalog + Preise + Bilder)
 

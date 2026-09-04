@@ -47,7 +47,7 @@ Alle Preise sind EUR mit zwei Nachkommastellen, `null` = keine Daten. Die Datei 
 | 1083 | 495 | Sets / Premium Collections? |
 | 1654 | 25 | ? |
 
-Die Zuordnung der Nicht-51-Kategorien braucht die Datei `products_nonsingles_6.json` (enthält `categoryName`).
+Die Kategorienamen sind über `products_nonsingles_6.json` bestätigt, siehe `08-id-mapping.md`.
 
 ## Datenqualität (Einzelkarten, Kategorie 51)
 
@@ -76,5 +76,5 @@ Die Zuordnung der Nicht-51-Kategorien braucht die Datei `products_nonsingles_6.j
 ## Offen
 
 1. Nutzungsbedingungen der Data-Seite (Attribution, kommerzielle Nutzung).
-2. `products_singles_6.json` prüfen: Enthält `name` Set-Kürzel + Nummer? Gibt es `idExpansion` und ein Expansion-Verzeichnis?
-3. Kategorie-Namen aus `products_nonsingles_6.json`.
+
+Produktkataloge sind geprüft, siehe `08-id-mapping.md` (Kategorienamen, Namensmuster, Mapping-Strategie).
