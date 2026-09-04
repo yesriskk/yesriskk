@@ -11,6 +11,7 @@ Die Spalte *Phase* verweist auf die Roadmap in `04-roadmap.md`.
 | A2 | Karte manuell zur Sammlung hinzufügen (Menge, Zustand, Sprache, Variante, Kaufpreis, Kaufdatum) | M | 1 | Zustand nach Cardmarket-Skala (MT/NM/EX/GD/LP/PL/PO). |
 | A3 | **Scanner: Einzelkarte per Foto** | M | 2 | Erkennung on-device über perzeptuelle Hashes + OCR-Tiebreaker (siehe Architektur). |
 | A4 | **Bulk-Scanner: Live-Kamera/Video, Karten nacheinander hinhalten** | S | 3 | Kontinuierliche Frame-Verarbeitung, Auto-Add bei stabilem Match, Undo-Stack. |
+| A4b | **Desktop-Flachbett-Scanner: 9 Karten pro A4-Scan, Kontaktbogen-Review, eSCL ohne Treiber** | S | 2 | Siehe ADR-003. Zuverlässiger als Kamera, ideal für Erstbefüllung großer Sammlungen. |
 | A5 | Scan-Review-Queue: unsichere Treffer mit Top-3-Kandidaten bestätigen | S | 2 | Verhindert Falscheinträge im Bulk-Modus. |
 | A6 | Sealed-Produkte erfassen (Booster Box, ETB, Display, Tins, Blister) | S | 3 | Optional per EAN-Barcode-Scan. |
 | A7 | Import aus CSV / anderen Apps (Cardmarket-Wants, Collectr, TCG Collector) | C | 4 | Mapping-Assistent. |

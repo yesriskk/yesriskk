@@ -4,7 +4,8 @@
 
 | ADR | Frage | Optionen | Empfehlung | Bis wann |
 |---|---|---|---|---|
-| 001 | Mobile-Stack | Expo/RN vs. native SwiftUI vs. Flutter | Expo/RN (Cross-Platform, ein Stack, Claude-freundlich) | Phase 0, Woche 1 |
+| 001 | Client-Stack (iOS + Desktop) | Expo + Tauri vs. native Swift (iOS + macOS) vs. Flutter | Expo + Tauri, sofern Windows-Desktop nicht ausgeschlossen ist | Phase 0, Woche 1 |
+| 003a | Desktop-Scanner-Anbindung | eSCL direkt vs. NAPS2 vs. Ordner-Import | Stufenmodell: Ordner → eSCL → NAPS2 (ADR-003) | Phase 0 |
 | 002 | Backend | Supabase vs. eigenes Postgres + Node-API | Supabase + separater Worker | Phase 0, Woche 1 |
 | 003 | Graded-Preisquelle | PriceCharting vs. Scrydex vs. manuell | Trial beider in Phase 2, Entscheidung vor Phase 3 | Ende Phase 2 |
 | 004 | Offline-Sync-Strategie | eigener Sync (updated_at/soft-delete) vs. PowerSync/WatermelonDB/ElectricSQL | Prototyp beider in Phase 1, Woche 1 | Phase 1, Woche 2 |
@@ -27,4 +28,6 @@
 | **Zwei-Personen-Projekt verliert Momentum** | mittel | hoch | Kleine Milestones, M0 nach 2 Wochen, eigene Sammlung als Motivation, wöchentlicher Sync |
 | **Große Claude-Diffs kollidieren** | mittel | mittel | Paketgrenzen, Contract-first, kleine PRs, worktrees |
 | **Live Activities enttäuschen** (8-h-Limit, kein Dauer-Widget) | hoch | niedrig | Erwartung im Feature klar kommunizieren; Home-Widget als "Dauer-Anzeige" |
+| **Scanner-Modell der Devs spricht kein eSCL** oder liefert schlechte Scans | mittel | mittel | Modell vor Phase 0 prüfen (Herstellerangabe "AirPrint/AirScan" oder mDNS-Test); Ordner-Import als garantierter Fallback |
+| **App-Store-Ablehnung wegen Pokémon-Marke** (Guideline 5.2) | mittel | hoch | Neutraler Name, eigene Grafiken, Disclaimer, keine offiziellen Assets; Ablehnung einplanen (eine Runde) |
 | **Speicher/Performance bei 15 Mio Snapshot-Zeilen/Jahr** | niedrig | mittel | Partitionierung, Aggregat-Tabellen (Wochen-/Monatswerte), Retention-Policy für Tagesdaten > 2 Jahre |

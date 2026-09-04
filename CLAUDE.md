@@ -12,7 +12,8 @@ Planungsphase. Es gibt noch keinen Code. Lies vor jeder Arbeit:
 
 ## Geplanter Stack (siehe ADR-001/002)
 
-- Monorepo: pnpm workspaces + Turborepo. `apps/mobile` (Expo, TypeScript, Expo Router), `apps/worker` (Node/TS, Hono, Cron), `packages/{shared,db,pricing,card-matcher,ui}`, `supabase/`.
+- Monorepo: pnpm workspaces + Turborepo. `apps/mobile` (Expo, TypeScript, Expo Router; iOS + Web-Build), `apps/desktop` (Tauri 2, lädt Web-Build, Scanner-Bridge eSCL in Rust), `apps/worker` (Node/TS, Hono, Cron), `packages/{shared,db,pricing,card-matcher,ui}`, `supabase/`.
+- Ziele: iOS-App und Desktop-App (Windows/macOS). Android ist kein Ziel für v1.
 - Backend: Supabase (Postgres + RLS + Auth + Storage, EU). Worker auf Fly.io/Railway.
 - Lokale DB in der App: expo-sqlite + Drizzle. Offline-first.
 

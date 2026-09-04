@@ -6,6 +6,7 @@
 |---|---|---|
 | Mobile App | **Expo (React Native) + TypeScript**, Expo Router, `react-native-vision-camera` (Frame-Prozessoren), `expo-sqlite` + Drizzle für lokale DB | iOS + Android aus einer Codebase; TS über den ganzen Stack → Claude Code und beide Devs arbeiten in einer Sprache; Vision Camera erlaubt Echtzeit-Frame-Verarbeitung für den Scanner. |
 | iOS-native Teile | **Expo Modules (Swift)**: Live Activity / Dynamic Island, WidgetKit, alternative App-Icons | Nur hier braucht es Swift. Als eigenes Paket kapseln, damit es den Rest nicht blockiert. |
+| Desktop-App | **Tauri 2** (Rust-Kern, Webview) lädt den Expo-Web-Build; Scanner-Bridge (eSCL) als Tauri-Command | Windows + macOS aus einer Codebasis, kleiner Installer, Scanner-Zugriff ohne Browser-Grenzen. Siehe ADR-001/003. |
 | Backend | **Supabase** (Postgres, Auth, Storage, Row Level Security, Realtime) in EU-Region | Auth/Storage/RLS fertig, wir konzentrieren uns auf Domäne. |
 | Worker / Jobs | **Node/TS-Service** (Fly.io oder Railway, EU) mit Cron: Katalog-Sync, Preis-Snapshots, Alarm-Auswertung, Hash-Index-Build | Supabase Edge Functions sind für 20k-Karten-Batches zu limitiert (Timeouts). |
 | API-Layer | Supabase direkt (PostgREST + RLS) für CRUD; eigene HTTP-Endpoints (Hono auf dem Worker) für Scanner-Matching-Fallback, eBay-Proxy, Reports | Vermeidet eine zweite Backend-Codebasis für Standard-CRUD. |
@@ -21,7 +22,8 @@
 ```
 .
 ├── apps/
-│   ├── mobile/            # Expo-App
+│   ├── mobile/            # Expo-App (iOS; Web-Build für Desktop)
+│   ├── desktop/           # Tauri-Shell + Scanner-Bridge (Rust), lädt apps/mobile Web-Build
 │   └── worker/            # Cron-Jobs + HTTP-Endpoints (Hono)
 ├── packages/
 │   ├── shared/            # Zod-Schemas, Domain-Typen, Konstanten (Zustände, Sprachen, Varianten)
@@ -39,7 +41,13 @@
 
 ```mermaid
 flowchart LR
-  subgraph Device[iPhone / Android]
+  subgraph Desktop[Windows / macOS]
+    DApp[Tauri: Expo-Web-Build]
+    Scan[Scanner-Bridge eSCL]
+    DApp --- Scan
+    Scan --> Flatbed[(Flachbett-Scanner)]
+  end
+  subgraph Device[iPhone]
     App[Expo App]
     LocalDB[(SQLite)]
     Cam[Vision Camera + Matcher]
@@ -61,6 +69,7 @@ flowchart LR
   CM[(Cardmarket Price Guide Download)]
   Graded[(Scrydex / PriceCharting)]
   eBay[(eBay Sell APIs)]
+  DApp <--> PG
   App <--> PG
   App <--> Auth
   App <--> Store
@@ -119,6 +128,7 @@ Frame → Karten-Detektion (Rechteck, 63×88 mm Ratio) → Perspektiv-Korrektur 
 - **Bulk/Video-Modus:** Frame-Prozessor läuft mit ~10 fps; ein Match gilt erst als stabil, wenn er in 3 aufeinanderfolgenden Frames identisch ist; danach Cooldown, bis ein anderer Hash erscheint. Haptisches Feedback + Chip-Liste oben, Undo per Swipe.
 - **Reverse Holo vs. Normal** ist per Hash schwer zu unterscheiden → Nutzer wählt Variante per Toggle (Default merkbar), später Glanz-Heuristik.
 - **Fallback:** Bei Konfidenz unter Schwelle kann das Bild (opt-in) an den Worker geschickt werden, der mit einem Embedding-Modell (z. B. CLIP/DINOv2-Small) sucht. Erst ab Phase 3.
+- **Flachbett-Pfad (Desktop):** Scan → Segmentierung in Einzelkarten (Rechtecke mit 63:88) → Rotation → derselbe Hash/OCR-Match wie oben, nur ohne Perspektiv-Korrektur und mit höherer Trefferquote. Details ADR-003.
 - **Vorbild-Projekte:** Open-Source-Scanner mit pHash + Hamming-Distanz (jslok/card-scanner, 1vcian/Pokemon-TCGP-Card-Scanner, em4go/PokeCard-TCG-detector) zeigen, dass der Ansatz funktioniert.
 
 ## Live Activity / Dynamic Island

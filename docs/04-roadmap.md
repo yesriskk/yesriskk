@@ -36,7 +36,9 @@ Ziel: Repo, Infrastruktur und der tägliche Preis-Snapshot laufen. **Ab M0 samme
 | `apps/worker`: ID-Mapping Cardmarket ↔ TCGdex nach Pipeline in `08-id-mapping.md` (TCGdex-Seed, Expansion-Tabelle, Name+Attacken, Reihenfolge), Abdeckung messen | Dev B | ≥ 90 % der Karten mit Trend ≥ 5 € gemappt, Rest in Review-Tabelle |
 | Manuelle Kuratierung `cardmarket_expansions` (774 Zeilen, Sprache + TCGdex-Set) | Dev A | Tabelle vollständig |
 | `apps/worker`: täglicher Preis-Snapshot-Job (Cardmarket-Download + TCGdex) + Rohdatei-Archiv + FX-Job, Deploy auf Fly.io, Alerting bei Fehlschlag | Dev B | Cron läuft in Prod |
-| Expo-App-Skeleton: Router, Auth-Screens (Supabase), Design-Tokens, Navigation-Grundgerüst | Dev A | App startet, Login funktioniert |
+| Expo-App-Skeleton: Router, Auth-Screens (Supabase), Design-Tokens, Navigation-Grundgerüst; Web-Build läuft | Dev A | App startet auf iPhone und im Browser, Login funktioniert |
+| Tauri-Shell `apps/desktop`, die den Web-Build lädt; Spike: eSCL-Discovery gegen eigenen Drucker-Scanner | Dev A | Desktop-Fenster zeigt App; Scanner wird gefunden |
+| Apple Developer Program abschließen, Bundle-ID, EAS-Projekt | Dev A | erster TestFlight-Build |
 | CI: Lint/Typecheck/Test auf PR, EAS Preview Build | Dev A | PR-Checks grün |
 | `CLAUDE.md`, `.claude/`-Commands, PR-Template, Issue-Labels | beide | Team-Konventionen live |
 
@@ -58,12 +60,13 @@ Features: A1, A2, B1, B2, B3, B4, B11, C1, F3, F4, F7, G4 (Basis).
 
 ## Phase 2 – Scanner v1 & Organisation (Woche 9–14) → Milestone **M2 "Ich scanne statt zu tippen"**
 
-Features: A3, A5, B7, B9, F1, F2.
+Features: A3, A4b, A5, B7, B9, F1, F2.
 
 | Task | Owner | Notizen |
 |---|---|---|
 | `packages/card-matcher`: dHash/pHash, Hamming-Suche, Unit-Tests mit Referenzbildern | Dev B | Plattformneutral, in Node testbar |
 | Worker: Hash-Index-Build pro Sprache, Versionierung, Auslieferung über Storage | Dev B | |
+| **Desktop-Flachbett-Scanner**: Ordner-Import, eSCL-Scan, Segmentierung (9 Karten/Seite), Kontaktbogen-Review, "Alle übernehmen" | Dev A | 100 Karten in < 5 Minuten erfasst |
 | Kamera-Screen (Vision Camera): Karten-Detektion, Perspektiv-Korrektur, Einzelfoto-Scan | Dev A | Frame-Prozessor in JS/Worklets, ggf. kleines natives Modul für OpenCV |
 | OCR-Tiebreaker (Kartennummer) über ML Kit / Vision | Dev A | |
 | Scan-Review-Queue (Top-3-Kandidaten, Variante wählen, Zustand setzen) | Dev A | |
@@ -71,7 +74,7 @@ Features: A3, A5, B7, B9, F1, F2.
 | Winner/Loser der Sammlung (24h/7d/30d/90d) | Dev B | |
 | Master-Set-Tracker (Fortschritt, fehlende Karten, Kosten bis Komplettierung) | Dev A | |
 | Virtuelle Binder (Seiten, Drag-and-drop) | Dev A | |
-| Scanner-Feldtest: 300 Karten, Trefferquote messen, Schwellen tunen | beide | Zielwert ≥ 95 % |
+| Scanner-Feldtest: 300 Karten per Flachbett und 300 per Kamera, Trefferquote messen, Schwellen tunen | beide | Flachbett ≥ 98 %, Kamera ≥ 95 % |
 
 ## Phase 3 – Bulk, Sealed, Grading, iOS-Delight (Woche 15–22) → Milestone **M3 "Feature-komplett für v1.0"**
 
@@ -103,14 +106,15 @@ Features: D1, D4, D5, A7, B6 (Aktivitäts-Score), B8, C6, C7, E5, E6, F5, F6, G5
 | Share-Bild, öffentliches Profil, Tauschliste | Dev A | |
 | Wochenreport, Versicherungs-PDF | Dev B | |
 | Submission-Tracker, Population-Reports (falls Quelle) | Dev B | |
-| Store-Listing, Datenschutzerklärung, Impressum, Onboarding, Crash-Reporting (Sentry), Analytics (privacy-freundlich) | beide | |
+| Store-Listing, Datenschutzerklärung, Impressum, Onboarding, Crash-Reporting (Sentry), Analytics (privacy-freundlich); Checkliste `11-ios-release.md` | beide | |
+| Desktop-Verteilung: macOS-Notarisierung, Windows-Installer (Signing optional), Auto-Update über Tauri | Dev A | |
 | Public Beta → Release | beide | |
 
 ## Nach 1.0 (Ideen-Backlog)
 
 - KI-Grade-Schätzung (Forschungs-Spike), Embedding-basierter Scanner-Fallback.
 - Weitere TCGs (One Piece, Lorcana) über `game`-Spalte.
-- Android-Widgets, Apple Watch-Komplikation.
+- Android-Version (Expo macht es möglich), Apple Watch-Komplikation.
 - Familien-/Team-Sammlungen, Händler-Modus (Inventar mit Einkaufs-/Verkaufsbuch).
 - Cardmarket-Provider, falls API wieder öffnet.
 

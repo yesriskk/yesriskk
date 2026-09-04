@@ -20,7 +20,7 @@ Primärmarkt: **DACH / Europa** (EUR, Cardmarket als Referenz, deutsche Karten).
 - Deck-Builder / Spielfunktionen (wir bauen für Sammler, nicht für Spieler).
 - Eigener Marktplatz mit Zahlungsabwicklung.
 - Andere TCGs (Magic, One Piece, Lorcana). Das Datenmodell soll es aber nicht verhindern (`game`-Spalte von Anfang an).
-- Android-Parität für rein iOS-spezifische Features (Dynamic Island, Live Activities).
+- Android. Der Stack lässt es später zu, aber es ist kein Ziel für v1.
 
 ## Erfolgskriterien für v1.0
 
@@ -32,6 +32,7 @@ Primärmarkt: **DACH / Europa** (EUR, Cardmarket als Referenz, deutsche Karten).
 ## Leitprinzipien
 
 1. **Offline-first**: Sammlung ist lokal immer verfügbar, Sync passiert im Hintergrund.
+1a. **Zwei Clients, ein Kern**: iOS-App für unterwegs (Kamera, Alarme, Portfolio), Desktop-App für die Massenerfassung per Flachbett-Scanner. Beide teilen Matcher, Typen und Sync.
 2. **Eigene Preis-Historie**: Wir speichern täglich Snapshots und sind damit nicht von einer externen Historien-API abhängig.
 3. **Sprache ist ein First-Class-Attribut**: Jede Karte hat eine Sprache, jedes Bild kommt in der passenden Sprache.
 4. **Erst Daten, dann Glanz**: Katalog + Preise + Portfolio stabil, bevor Scanner-Magie und Dynamic Island kommen.

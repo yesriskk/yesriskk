@@ -19,6 +19,7 @@ Digitale Pokémon-Kartensammlung mit Preisen, Preisentwicklung, Portfolio-Tracki
 | [docs/08-id-mapping.md](docs/08-id-mapping.md) | Analyse der Produktkataloge und Mapping-Strategie Cardmarket ↔ TCGdex |
 | [docs/09-cardmarket-anfrage.md](docs/09-cardmarket-anfrage.md) | Optionaler Entwurf einer Anfrage an Cardmarket |
 | [docs/10-vergleich-cardmarket-tcgdex.md](docs/10-vergleich-cardmarket-tcgdex.md) | Was Cardmarket-Download und TCGdex jeweils liefern und was wir wofür nutzen |
+| [docs/11-ios-release.md](docs/11-ios-release.md) | Voraussetzungen, Ablauf und Kosten für iOS-Release und Desktop-Verteilung |
 | [tools/analysis/](tools/analysis/) | Reproduzierbare Analyse-Skripte |
 | [docs/adr/](docs/adr/) | Architecture Decision Records |
 | [CLAUDE.md](CLAUDE.md) | Konventionen, die Claude Code bei beiden Entwicklern automatisch liest |
