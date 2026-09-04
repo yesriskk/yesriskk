@@ -18,12 +18,13 @@ Karten sollen am Desktop über einen Flachbett- oder Dokumentenscanner erfasst w
 | ImageCaptureCore | Apple-Framework | nur macOS, nur native App | niedrig (Swift) | hoch |
 | WIA/TWAIN direkt | Windows-APIs über Rust/Node-Bindings | nur Windows | hoch | mittel (Treiberzoo) |
 
-## Entscheidung (Vorschlag)
+## Entscheidung (Vorschlag, aktualisiert: Ziel ist nur noch macOS)
 
-Stufenmodell in `apps/desktop`:
-1. **Ordner-Import + Drag-and-drop** zuerst (Phase 2, Woche 1). Funktioniert mit jedem Scanner sofort und ist auch für Fotos vom Handy nützlich.
-2. **eSCL direkt** als Standardweg (Phase 2). Kein Treiber, kein Zusatzprogramm, funktioniert unter Windows und macOS gleich.
-3. **NAPS2-Fallback** für USB-only-Scanner ohne Netzwerk (Phase 3, optional).
+Bei **Swift (ADR-001 Option A):**
+1. **ImageCaptureCore** als Standardweg: Geräteliste (USB und Netzwerk), Flachbett und Einzug, Auflösung/Farbraum setzen, Scan als Bild erhalten. Apples "Digitale Bilder"-App nutzt dieselbe API, jeder am Mac funktionierende Scanner ist damit erreichbar.
+2. **Ordner-Import + Drag-and-drop** als Fallback und für Fotos.
+
+Bei **Expo + Tauri (Option B):** Stufenmodell Ordner-Import → eSCL direkt → NAPS2-Fallback.
 
 ## Verarbeitungspipeline
 

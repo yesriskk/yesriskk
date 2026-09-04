@@ -12,10 +12,11 @@ Planungsphase. Es gibt noch keinen Code. Lies vor jeder Arbeit:
 
 ## Geplanter Stack (siehe ADR-001/002)
 
-- Monorepo: pnpm workspaces + Turborepo. `apps/mobile` (Expo, TypeScript, Expo Router; iOS + Web-Build), `apps/desktop` (Tauri 2, lädt Web-Build, Scanner-Bridge eSCL in Rust), `apps/worker` (Node/TS, Hono, Cron), `packages/{shared,db,pricing,card-matcher,ui}`, `supabase/`.
-- Ziele: iOS-App und Desktop-App (Windows/macOS). Android ist kein Ziel für v1.
-- Backend: Supabase (Postgres + RLS + Auth + Storage, EU). Worker auf Fly.io/Railway.
-- Lokale DB in der App: expo-sqlite + Drizzle. Offline-first.
+- Ziele: iOS-App und macOS-App, pro Nutzer synchron (ADR-004). Android/Windows sind keine Ziele.
+- Clients: ADR-001 offen zwischen nativem Swift (empfohlen; ein Xcode-Projekt, `apps/apple`, Domänen-Package `PokeVaultKit`) und Expo + Tauri. Bis zur Entscheidung keinen Client-Code anlegen.
+- Backend (ADR-002, angenommen): Supabase in bestehender Org, Region EU, RLS überall. Worker als TypeScript auf Vercel Cron (`apps/worker`). Statische Seiten auf Vercel.
+- Monorepo: pnpm workspaces + Turborepo für `apps/worker`, `packages/{shared,db,pricing,card-matcher}`, `supabase/`; Apple-Code daneben in `apps/apple`.
+- Lokaler Cache im Client (SQLite) + Outbox + Supabase Realtime, Last-Write-Wins über `updated_at`.
 
 ## Konventionen
 

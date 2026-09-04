@@ -27,18 +27,18 @@ Ziel: Repo, Infrastruktur und der tägliche Preis-Snapshot laufen. **Ab M0 samme
 
 | Task | Owner-Vorschlag | Ergebnis |
 |---|---|---|
-| ADR-001 Tech-Stack bestätigen (Expo vs. Native) | beide | ADR gemerged |
+| ADR-001 entscheiden (Swift vs. Expo+Tauri), ADR-004 Sync bestätigen | beide | ADRs auf "Angenommen" |
 | Monorepo aufsetzen (pnpm, Turborepo, ESLint, Prettier, TS strict, Vitest) | Dev A | `pnpm lint/test/typecheck` grün |
-| Supabase-Projekt (EU) + lokales Setup (`supabase start`) + Migrations-Workflow | Dev B | erste Migration gemerged |
+| Supabase-Projekt in bestehender Org (EU Frankfurt) + lokales Setup (`supabase start`) + Migrations-Workflow | Dev B | erste Migration gemerged |
 | `packages/db`: Schema `cards`, `sets`, `price_snapshots`, `fx_rates` | Dev B | Migration + Drizzle-Typen |
 | Cardmarket-Quellenangabe und Link-Konvention festlegen (Attribution in Kartendetail, Portfolio, Store-Text) | Dev A | Konvention in `packages/ui` dokumentiert |
 | `apps/worker`: Katalog-Import aus dem TCGdex-Datenbank-Clone (alle Sprachen, `thirdParty`-IDs, Attacken) + Cardmarket-Produktkatalog-Import | Dev B | ~42k Karten + 78k Cardmarket-Produkte in DB |
 | `apps/worker`: ID-Mapping Cardmarket ↔ TCGdex nach Pipeline in `08-id-mapping.md` (TCGdex-Seed, Expansion-Tabelle, Name+Attacken, Reihenfolge), Abdeckung messen | Dev B | ≥ 90 % der Karten mit Trend ≥ 5 € gemappt, Rest in Review-Tabelle |
 | Manuelle Kuratierung `cardmarket_expansions` (774 Zeilen, Sprache + TCGdex-Set) | Dev A | Tabelle vollständig |
-| `apps/worker`: täglicher Preis-Snapshot-Job (Cardmarket-Download + TCGdex) + Rohdatei-Archiv + FX-Job, Deploy auf Fly.io, Alerting bei Fehlschlag | Dev B | Cron läuft in Prod |
-| Expo-App-Skeleton: Router, Auth-Screens (Supabase), Design-Tokens, Navigation-Grundgerüst; Web-Build läuft | Dev A | App startet auf iPhone und im Browser, Login funktioniert |
-| Tauri-Shell `apps/desktop`, die den Web-Build lädt; Spike: eSCL-Discovery gegen eigenen Drucker-Scanner | Dev A | Desktop-Fenster zeigt App; Scanner wird gefunden |
-| Apple Developer Program abschließen, Bundle-ID, EAS-Projekt | Dev A | erster TestFlight-Build |
+| `apps/worker`: täglicher Preis-Snapshot-Job (Cardmarket-Download + TCGdex) + Rohdatei-Archiv + FX-Job als Vercel Cron, Chunking, Alerting bei Fehlschlag | Dev B | Cron läuft in Prod |
+| App-Skeleton (bei Swift: Xcode-Projekt mit iOS- und macOS-Target, `PokeVaultKit`-Package, Auth-Screens über supabase-swift; bei Expo: siehe ADR-001 B) | Dev A | App startet auf iPhone und Mac, Login funktioniert |
+| Spike Scanner: ImageCaptureCore gegen eigenen Drucker-Scanner, ein A4-Scan als Bild in der App | Dev A | Scan landet in der App |
+| Apple Developer Program abschließen, Bundle-IDs, Xcode Cloud oder Fastlane | Dev A | erster TestFlight-Build |
 | CI: Lint/Typecheck/Test auf PR, EAS Preview Build | Dev A | PR-Checks grün |
 | `CLAUDE.md`, `.claude/`-Commands, PR-Template, Issue-Labels | beide | Team-Konventionen live |
 
@@ -51,7 +51,7 @@ Features: A1, A2, B1, B2, B3, B4, B11, C1, F3, F4, F7, G4 (Basis).
 | Katalog-Browsing: Sets → Karten, Suche, Filter (Sprache, Rarity), Kartendetail mit Bild in gewählter Sprache | Dev A | Bilder via TCGdex-CDN, Cache |
 | Kartendetail: aktueller Preis (EUR/USD), Δ 24h/7d/30d, Chart mit Zeitraum-Umschalter | Dev A | Chart-Daten aus `price_snapshots` |
 | Sammlung: Item hinzufügen/bearbeiten/löschen (Menge, Zustand, Sprache, Variante, Kaufpreis, Datum, Notiz, Foto) | Dev A | Foto-Upload in Storage |
-| Lokale SQLite + Sync-Engine (Offline-first) | Dev A | Größtes technisches Risiko dieser Phase, früh anfangen |
+| Lokaler Cache + Outbox + Realtime-Sync nach ADR-004; Test: Scan am Mac erscheint auf dem iPhone | Dev A | Größtes technisches Risiko dieser Phase, früh anfangen |
 | `card_price_current` + `card_price_change` Views, Portfolio-Snapshot-Job | Dev B | |
 | Portfolio-Screen: Gesamtwert, Cost-Basis, Entwicklung als Chart, Verteilung nach Set | Dev B (Backend + Screen) | |
 | Push-Notifications-Grundgerüst (Expo Push, Token-Registrierung) | Dev B | |
@@ -66,7 +66,7 @@ Features: A3, A4b, A5, B7, B9, F1, F2.
 |---|---|---|
 | `packages/card-matcher`: dHash/pHash, Hamming-Suche, Unit-Tests mit Referenzbildern | Dev B | Plattformneutral, in Node testbar |
 | Worker: Hash-Index-Build pro Sprache, Versionierung, Auslieferung über Storage | Dev B | |
-| **Desktop-Flachbett-Scanner**: Ordner-Import, eSCL-Scan, Segmentierung (9 Karten/Seite), Kontaktbogen-Review, "Alle übernehmen" | Dev A | 100 Karten in < 5 Minuten erfasst |
+| **Mac-Flachbett-Scanner**: ImageCaptureCore-Scan, Ordner-Import, Segmentierung (9 Karten/Seite), Kontaktbogen-Review, "Alle übernehmen" | Dev A | 100 Karten in < 5 Minuten erfasst, sofort auf dem iPhone sichtbar |
 | Kamera-Screen (Vision Camera): Karten-Detektion, Perspektiv-Korrektur, Einzelfoto-Scan | Dev A | Frame-Prozessor in JS/Worklets, ggf. kleines natives Modul für OpenCV |
 | OCR-Tiebreaker (Kartennummer) über ML Kit / Vision | Dev A | |
 | Scan-Review-Queue (Top-3-Kandidaten, Variante wählen, Zustand setzen) | Dev A | |
@@ -107,7 +107,7 @@ Features: D1, D4, D5, A7, B6 (Aktivitäts-Score), B8, C6, C7, E5, E6, F5, F6, G5
 | Wochenreport, Versicherungs-PDF | Dev B | |
 | Submission-Tracker, Population-Reports (falls Quelle) | Dev B | |
 | Store-Listing, Datenschutzerklärung, Impressum, Onboarding, Crash-Reporting (Sentry), Analytics (privacy-freundlich); Checkliste `11-ios-release.md` | beide | |
-| Desktop-Verteilung: macOS-Notarisierung, Windows-Installer (Signing optional), Auto-Update über Tauri | Dev A | |
+| Mac-Verteilung: Mac App Store oder notarisierter Download mit Sparkle-Updates | Dev A | |
 | Public Beta → Release | beide | |
 
 ## Nach 1.0 (Ideen-Backlog)

@@ -1,6 +1,20 @@
 # 03 – Architektur
 
-## Tech-Stack (Empfehlung, als ADR-001 zu bestätigen)
+> **Stand 2026-09-04:** Ziele sind iOS + macOS, Sync pro Nutzer zwischen beiden. ADR-002 (Supabase + Vercel) ist angenommen, ADR-001 tendiert zu **nativem Swift**; die Tabelle unten zeigt beide Varianten, bis ADR-001 entschieden ist. ADR-004 beschreibt den Sync.
+
+## Tech-Stack (ADR-001 offen zwischen Variante A und B)
+
+| Schicht | Variante A: Swift (empfohlen) | Variante B: Expo + Tauri |
+|---|---|---|
+| iOS-App | SwiftUI, AVFoundation + Vision (Kamera, Rechteck, OCR), ActivityKit/WidgetKit | Expo, Vision Camera, Swift-Modul für Widgets |
+| macOS-App | dasselbe Xcode-Projekt, macOS-Target, ImageCaptureCore für Scanner | Tauri-Webview mit Expo-Web-Build, eSCL in Rust |
+| Lokaler Cache | GRDB (SQLite) | expo-sqlite + Drizzle |
+| Sync | supabase-swift (Auth, PostgREST, Realtime, Storage) + eigene Outbox (ADR-004) | supabase-js + eigene Outbox |
+| Geteilte Typen | `packages/shared` (Zod) → generierte Swift-Typen | `packages/shared` direkt |
+| Matcher | Swift-Implementierung + TS-Implementierung im Worker, gemeinsame Testvektoren | ein TS-Paket überall |
+| Backend / Worker | identisch: Supabase (EU) + Vercel Cron (TypeScript) | identisch |
+
+## Ursprünglicher Stack-Vorschlag (Variante B im Detail)
 
 | Schicht | Wahl | Begründung |
 |---|---|---|
