@@ -32,7 +32,7 @@ Primärmarkt: **DACH / Europa** (EUR, Cardmarket als Referenz, deutsche Karten).
 ## Leitprinzipien
 
 1. **Offline-first**: Sammlung ist lokal immer verfügbar, Sync passiert im Hintergrund.
-1a. **Zwei Clients, ein Kern**: iOS-App für unterwegs (Kamera, Alarme, Portfolio), Desktop-App für die Massenerfassung per Flachbett-Scanner. Beide teilen Matcher, Typen und Sync.
+1a. **Zwei Clients, ein Kern**: iOS-App für unterwegs (Kamera, Alarme, Portfolio), macOS-App für die Massenerfassung per Flachbett-Scanner. Beide aus einem Xcode-Projekt, gemeinsames Swift-Package, ein Nutzerkonto, alles synchron.
 2. **Eigene Preis-Historie**: Wir speichern täglich Snapshots und sind damit nicht von einer externen Historien-API abhängig.
 3. **Sprache ist ein First-Class-Attribut**: Jede Karte hat eine Sprache, jedes Bild kommt in der passenden Sprache.
 4. **Erst Daten, dann Glanz**: Katalog + Preise + Portfolio stabil, bevor Scanner-Magie und Dynamic Island kommen.

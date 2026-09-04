@@ -1,6 +1,6 @@
 # ADR-003: Desktop-Scanner-Anbindung (Flachbett)
 
-- Status: **Vorgeschlagen**
+- Status: **Angenommen** (2026-09-04, folgt aus ADR-001): ImageCaptureCore + Ordner-Import
 - Datum: 2026-09-04
 - Entscheider: Dev A, Dev B
 
@@ -18,13 +18,13 @@ Karten sollen am Desktop über einen Flachbett- oder Dokumentenscanner erfasst w
 | ImageCaptureCore | Apple-Framework | nur macOS, nur native App | niedrig (Swift) | hoch |
 | WIA/TWAIN direkt | Windows-APIs über Rust/Node-Bindings | nur Windows | hoch | mittel (Treiberzoo) |
 
-## Entscheidung (Vorschlag, aktualisiert: Ziel ist nur noch macOS)
+## Entscheidung
 
-Bei **Swift (ADR-001 Option A):**
+Mit Swift (ADR-001):
 1. **ImageCaptureCore** als Standardweg: Geräteliste (USB und Netzwerk), Flachbett und Einzug, Auflösung/Farbraum setzen, Scan als Bild erhalten. Apples "Digitale Bilder"-App nutzt dieselbe API, jeder am Mac funktionierende Scanner ist damit erreichbar.
 2. **Ordner-Import + Drag-and-drop** als Fallback und für Fotos.
 
-Bei **Expo + Tauri (Option B):** Stufenmodell Ordner-Import → eSCL direkt → NAPS2-Fallback.
+Der eSCL-Weg bleibt als Notiz für den Fall, dass ein Gerät unter ImageCaptureCore nicht auftaucht (dann `Digitale Bilder`-App prüfen; taucht es dort auf, geht es auch bei uns).
 
 ## Verarbeitungspipeline
 
@@ -40,6 +40,6 @@ Scan (300 dpi, Farbe) → Hintergrund-Erkennung (Scannerdeckel = weiß/schwarz) 
 
 ## Konsequenzen
 
-- `packages/card-matcher` bekommt ein Modul `flatbed-segmentation` (reines TS auf Pixel-Arrays, testbar mit Beispielscans in `fixtures/`).
-- Desktop-App braucht eine Scanner-Bridge in Tauri (Rust) für eSCL-Discovery und -Scan; alles andere bleibt TypeScript.
+- Segmentierung (Karten auf der Scanfläche finden) läuft in Swift mit `Vision` (`VNDetectRectanglesRequest`) in `PokeVaultKit`; Testscans als Fixtures im Repo.
+- Scanner-Zugriff über `ImageCaptureCore` in einem macOS-only-Modul der App.
 - Testgeräte: mindestens ein eSCL-fähiger Drucker-Scanner pro Entwickler; Modell und Ergebnis in `docs/` festhalten.

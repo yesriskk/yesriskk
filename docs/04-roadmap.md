@@ -27,7 +27,7 @@ Ziel: Repo, Infrastruktur und der tägliche Preis-Snapshot laufen. **Ab M0 samme
 
 | Task | Owner-Vorschlag | Ergebnis |
 |---|---|---|
-| ADR-001 entscheiden (Swift vs. Expo+Tauri), ADR-004 Sync bestätigen | beide | ADRs auf "Angenommen" |
+| Projektname, GitHub-Organisation mit beiden Ownern, Repo umziehen | beide | neues Repo mit dieser Planung |
 | Monorepo aufsetzen (pnpm, Turborepo, ESLint, Prettier, TS strict, Vitest) | Dev A | `pnpm lint/test/typecheck` grün |
 | Supabase-Projekt in bestehender Org (EU Frankfurt) + lokales Setup (`supabase start`) + Migrations-Workflow | Dev B | erste Migration gemerged |
 | `packages/db`: Schema `cards`, `sets`, `price_snapshots`, `fx_rates` | Dev B | Migration + Drizzle-Typen |
@@ -36,9 +36,9 @@ Ziel: Repo, Infrastruktur und der tägliche Preis-Snapshot laufen. **Ab M0 samme
 | `apps/worker`: ID-Mapping Cardmarket ↔ TCGdex nach Pipeline in `08-id-mapping.md` (TCGdex-Seed, Expansion-Tabelle, Name+Attacken, Reihenfolge), Abdeckung messen | Dev B | ≥ 90 % der Karten mit Trend ≥ 5 € gemappt, Rest in Review-Tabelle |
 | Manuelle Kuratierung `cardmarket_expansions` (774 Zeilen, Sprache + TCGdex-Set) | Dev A | Tabelle vollständig |
 | `apps/worker`: täglicher Preis-Snapshot-Job (Cardmarket-Download + TCGdex) + Rohdatei-Archiv + FX-Job als Vercel Cron, Chunking, Alerting bei Fehlschlag | Dev B | Cron läuft in Prod |
-| App-Skeleton (bei Swift: Xcode-Projekt mit iOS- und macOS-Target, `PokeVaultKit`-Package, Auth-Screens über supabase-swift; bei Expo: siehe ADR-001 B) | Dev A | App startet auf iPhone und Mac, Login funktioniert |
+| App-Skeleton: Xcode-Projekt mit iOS- und macOS-Target, `PokeVaultKit`-Package, Auth-Screens über supabase-swift, Design-Tokens | Dev A | App startet im Simulator, am eigenen iPhone und am Mac; Login funktioniert |
 | Spike Scanner: ImageCaptureCore gegen eigenen Drucker-Scanner, ein A4-Scan als Bild in der App | Dev A | Scan landet in der App |
-| Apple Developer Program abschließen, Bundle-IDs, Xcode Cloud oder Fastlane | Dev A | erster TestFlight-Build |
+| Bundle-IDs festlegen; Developer Program **noch nicht** nötig (Simulator + eigenes iPhone reichen, siehe `11-ios-release.md`) | Dev A | – |
 | CI: Lint/Typecheck/Test auf PR, EAS Preview Build | Dev A | PR-Checks grün |
 | `CLAUDE.md`, `.claude/`-Commands, PR-Template, Issue-Labels | beide | Team-Konventionen live |
 
@@ -54,7 +54,7 @@ Features: A1, A2, B1, B2, B3, B4, B11, C1, F3, F4, F7, G4 (Basis).
 | Lokaler Cache + Outbox + Realtime-Sync nach ADR-004; Test: Scan am Mac erscheint auf dem iPhone | Dev A | Größtes technisches Risiko dieser Phase, früh anfangen |
 | `card_price_current` + `card_price_change` Views, Portfolio-Snapshot-Job | Dev B | |
 | Portfolio-Screen: Gesamtwert, Cost-Basis, Entwicklung als Chart, Verteilung nach Set | Dev B (Backend + Screen) | |
-| Push-Notifications-Grundgerüst (Expo Push, Token-Registrierung) | Dev B | |
+| Apple Developer Program abschließen; Push-Notifications-Grundgerüst (APNs-Key, Token-Registrierung, Versand aus dem Worker); erster TestFlight-Build für den jeweils anderen | Dev B (Backend) + Dev A (App) | Push kommt auf beiden iPhones an |
 | Settings: Sprachen für Bilder/Preise, Währung | Dev A | |
 | Interne Beta (TestFlight) mit beiden Sammlungen als Testdaten | beide | |
 
@@ -64,11 +64,11 @@ Features: A3, A4b, A5, B7, B9, F1, F2.
 
 | Task | Owner | Notizen |
 |---|---|---|
-| `packages/card-matcher`: dHash/pHash, Hamming-Suche, Unit-Tests mit Referenzbildern | Dev B | Plattformneutral, in Node testbar |
+| Hash-Algorithmus (dHash/pHash) in TS (`packages/card-matcher`) und Swift (`PokeVaultKit`), gemeinsame Testvektoren in `fixtures/` | Dev B (TS) + Dev A (Swift) | beide Implementierungen bestehen dieselben Tests |
 | Worker: Hash-Index-Build pro Sprache, Versionierung, Auslieferung über Storage | Dev B | |
 | **Mac-Flachbett-Scanner**: ImageCaptureCore-Scan, Ordner-Import, Segmentierung (9 Karten/Seite), Kontaktbogen-Review, "Alle übernehmen" | Dev A | 100 Karten in < 5 Minuten erfasst, sofort auf dem iPhone sichtbar |
-| Kamera-Screen (Vision Camera): Karten-Detektion, Perspektiv-Korrektur, Einzelfoto-Scan | Dev A | Frame-Prozessor in JS/Worklets, ggf. kleines natives Modul für OpenCV |
-| OCR-Tiebreaker (Kartennummer) über ML Kit / Vision | Dev A | |
+| Kamera-Screen (AVFoundation + Vision): Karten-Detektion, Perspektiv-Korrektur, Einzelfoto-Scan | Dev A | |
+| OCR-Tiebreaker (Kartennummer) über Vision `VNRecognizeTextRequest` | Dev A | |
 | Scan-Review-Queue (Top-3-Kandidaten, Variante wählen, Zustand setzen) | Dev A | |
 | Wishlist + Alarm-Regeln + Alarm-Auswertung im Worker + Push | Dev B | |
 | Winner/Loser der Sammlung (24h/7d/30d/90d) | Dev B | |
@@ -90,7 +90,7 @@ Features: A4, A6, A8, A9, B5, B10, C2, C4, C5, D3, E1, E2, E3, E4 (Zentrierung),
 | Grading-Guide (Content-Tabellen, Screens), Grading-ROI-Rechner, "Lohnt sich"-Liste | Dev B | |
 | Pregrading-Check: Zentrierungs-Messung per Kamera (Randerkennung), Foto-Checkliste | Dev A | |
 | Verkaufs-Alarme für eigene Karten | Dev B | |
-| **Live Activity / Dynamic Island** (Swift Expo Module), Icon-Auswahl, alternative App-Icons, Home-Widgets | Dev A (oder wer mehr Swift mag) | |
+| **Live Activity / Dynamic Island** (Widget-Extension, ActivityKit), Icon-Auswahl, alternative App-Icons, Home-Widgets | Dev A | |
 | Allokations-Charts | Dev B | |
 
 ## Phase 4 – Verkaufen, Social, Launch (Woche 23–30) → Milestone **M4 "App Store Release 1.0"**
@@ -114,7 +114,7 @@ Features: D1, D4, D5, A7, B6 (Aktivitäts-Score), B8, C6, C7, E5, E6, F5, F6, G5
 
 - KI-Grade-Schätzung (Forschungs-Spike), Embedding-basierter Scanner-Fallback.
 - Weitere TCGs (One Piece, Lorcana) über `game`-Spalte.
-- Android-Version (Expo macht es möglich), Apple Watch-Komplikation.
+- Apple Watch-Komplikation, Web-Ansicht der Sammlung auf Vercel (read-only).
 - Familien-/Team-Sammlungen, Händler-Modus (Inventar mit Einkaufs-/Verkaufsbuch).
 - Cardmarket-Provider, falls API wieder öffnet.
 

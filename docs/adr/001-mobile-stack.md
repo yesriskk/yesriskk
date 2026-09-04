@@ -1,6 +1,6 @@
 # ADR-001: Client-Stack (iOS-App + macOS-App)
 
-- Status: **Vorgeschlagen, Entscheidung steht an** (aktualisiert 2026-09-04)
+- Status: **Angenommen** (2026-09-04): Option A, natives Swift. Beide Entwickler arbeiten am Mac.
 - Datum: 2026-09-04
 - Entscheider: Dev A, Dev B
 
@@ -39,9 +39,9 @@ Mit dem Wegfall von Windows und Android fällt das stärkste Argument für React
 
 Keine Vorteile gegenüber A oder B in einem reinen Apple-Setup. Verworfen.
 
-## Empfehlung
+## Entscheidung
 
-**Option A (native Swift)**, unter einer Bedingung: Beide Entwickler haben einen Mac und wollen die Clients in Swift schreiben. Begründung: Alle drei anspruchsvollen Anforderungen (Flachbett-Scanner, Kamera-Erkennung, Dynamic Island) sind unter Swift eingebaute Plattformfunktionen und unter Option B jeweils eine Brücke mit eigenem Risiko. Bei zwei Personen in Teilzeit zählt, wie viele Baustellen gleichzeitig offen sind.
+**Option A (native Swift).** Beide Entwickler haben einen Mac; die Bedingung ist erfüllt. Begründung: Alle drei anspruchsvollen Anforderungen (Flachbett-Scanner, Kamera-Erkennung, Dynamic Island) sind unter Swift eingebaute Plattformfunktionen und unter Option B jeweils eine Brücke mit eigenem Risiko. Bei zwei Personen in Teilzeit zählt, wie viele Baustellen gleichzeitig offen sind.
 
 Falls einer von beiden Swift ablehnt, ist Option B tragfähig und wird mit ADR-003 (eSCL) umgesetzt.
 

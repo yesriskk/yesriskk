@@ -1,6 +1,6 @@
 # ADR-004: Sync zwischen iPhone und Mac
 
-- Status: **Vorgeschlagen**
+- Status: **Angenommen** (2026-09-04)
 - Datum: 2026-09-04
 - Entscheider: Dev A, Dev B
 
@@ -25,7 +25,7 @@ Ein Nutzer arbeitet abwechselnd am Mac (Scanner, Massenerfassung) und am iPhone 
 3. **CloudKit** (Apples Sync)
    - Verworfen: bindet Daten an iCloud-Account, keine Server-Auswertung (Portfolio, Alarme) möglich, Supabase wäre trotzdem nötig.
 
-## Entscheidung (Vorschlag)
+## Entscheidung
 
 **Option 1** für v1. Der Sync-Umfang ist überschaubar (Sammlung, Sealed, Wishlist, Binder, Verkäufe, Einstellungen), die Nutzer sind meist online, und Realtime liefert das "sofort auf dem anderen Gerät"-Gefühl. Sollte die Merge-Logik in Phase 1 mehr als zwei Wochen fressen, wechseln wir auf PowerSync (Option 2), das Datenmodell ist dafür bereits passend.
 

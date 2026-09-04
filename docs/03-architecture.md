@@ -1,50 +1,41 @@
 # 03 – Architektur
 
-> **Stand 2026-09-04:** Ziele sind iOS + macOS, Sync pro Nutzer zwischen beiden. ADR-002 (Supabase + Vercel) ist angenommen, ADR-001 tendiert zu **nativem Swift**; die Tabelle unten zeigt beide Varianten, bis ADR-001 entschieden ist. ADR-004 beschreibt den Sync.
-
-## Tech-Stack (ADR-001 offen zwischen Variante A und B)
-
-| Schicht | Variante A: Swift (empfohlen) | Variante B: Expo + Tauri |
-|---|---|---|
-| iOS-App | SwiftUI, AVFoundation + Vision (Kamera, Rechteck, OCR), ActivityKit/WidgetKit | Expo, Vision Camera, Swift-Modul für Widgets |
-| macOS-App | dasselbe Xcode-Projekt, macOS-Target, ImageCaptureCore für Scanner | Tauri-Webview mit Expo-Web-Build, eSCL in Rust |
-| Lokaler Cache | GRDB (SQLite) | expo-sqlite + Drizzle |
-| Sync | supabase-swift (Auth, PostgREST, Realtime, Storage) + eigene Outbox (ADR-004) | supabase-js + eigene Outbox |
-| Geteilte Typen | `packages/shared` (Zod) → generierte Swift-Typen | `packages/shared` direkt |
-| Matcher | Swift-Implementierung + TS-Implementierung im Worker, gemeinsame Testvektoren | ein TS-Paket überall |
-| Backend / Worker | identisch: Supabase (EU) + Vercel Cron (TypeScript) | identisch |
-
-## Ursprünglicher Stack-Vorschlag (Variante B im Detail)
+## Tech-Stack (ADR-001 bis 004, angenommen)
 
 | Schicht | Wahl | Begründung |
 |---|---|---|
-| Mobile App | **Expo (React Native) + TypeScript**, Expo Router, `react-native-vision-camera` (Frame-Prozessoren), `expo-sqlite` + Drizzle für lokale DB | iOS + Android aus einer Codebase; TS über den ganzen Stack → Claude Code und beide Devs arbeiten in einer Sprache; Vision Camera erlaubt Echtzeit-Frame-Verarbeitung für den Scanner. |
-| iOS-native Teile | **Expo Modules (Swift)**: Live Activity / Dynamic Island, WidgetKit, alternative App-Icons | Nur hier braucht es Swift. Als eigenes Paket kapseln, damit es den Rest nicht blockiert. |
-| Desktop-App | **Tauri 2** (Rust-Kern, Webview) lädt den Expo-Web-Build; Scanner-Bridge (eSCL) als Tauri-Command | Windows + macOS aus einer Codebasis, kleiner Installer, Scanner-Zugriff ohne Browser-Grenzen. Siehe ADR-001/003. |
-| Backend | **Supabase** (Postgres, Auth, Storage, Row Level Security, Realtime) in EU-Region | Auth/Storage/RLS fertig, wir konzentrieren uns auf Domäne. |
-| Worker / Jobs | **Node/TS-Service** (Fly.io oder Railway, EU) mit Cron: Katalog-Sync, Preis-Snapshots, Alarm-Auswertung, Hash-Index-Build | Supabase Edge Functions sind für 20k-Karten-Batches zu limitiert (Timeouts). |
-| API-Layer | Supabase direkt (PostgREST + RLS) für CRUD; eigene HTTP-Endpoints (Hono auf dem Worker) für Scanner-Matching-Fallback, eBay-Proxy, Reports | Vermeidet eine zweite Backend-Codebasis für Standard-CRUD. |
-| Charts | `victory-native` (Skia) | Performant auf Mobile. |
-| Monorepo | **pnpm workspaces + Turborepo** | Ein Repo, geteilte Typen, klare Paketgrenzen für Zwei-Personen-Arbeit. |
-| CI | GitHub Actions: Lint, Typecheck, Tests, EAS Build (Preview) auf PR | |
-| Distribution | EAS Build + TestFlight / Play Internal Testing | |
-
-**Alternative, die wir bewusst verworfen haben:** Native SwiftUI-App. Beste Kamera-/ML-Integration und Dynamic Island "for free", aber iOS-only und zwei Sprachen im Stack (Swift + Backend-TS). Falls beide Devs stark Apple-fokussiert sind und Android egal ist, ist das die bessere Wahl. Entscheidung in ADR-001.
+| iOS-App + macOS-App | **Ein Xcode-Projekt, SwiftUI**, Targets iOS 17+ und macOS 14+; Domänenlogik im Swift-Package `PokeVaultKit` | Beste Integration für Kamera, Scanner, Live Activity; ein UI-Code für beide Plattformen. |
+| Kamera (iPhone) | AVFoundation + Vision (`VNDetectRectanglesRequest`, `VNRecognizeTextRequest`) | Eingebaut, schnell, kein Drittanbieter. |
+| Scanner (Mac) | ImageCaptureCore | Treiberlos, jeder am Mac funktionierende Scanner (ADR-003). |
+| Dynamic Island / Widgets | ActivityKit, WidgetKit, alternative Icons | Nativ, kein Brückenmodul. |
+| Lokaler Cache | GRDB (SQLite) in `PokeVaultKit` | Offline-Anzeige, Outbox für Sync (ADR-004). |
+| Backend | **Supabase** (Postgres, Auth mit Sign in with Apple, Storage, Realtime, RLS), neues Projekt in bestehender Org, EU Frankfurt | ADR-002. |
+| Client-SDK | supabase-swift | Offizielles SDK für Auth, PostgREST, Realtime, Storage. |
+| Worker / Jobs | **TypeScript auf Vercel Cron** (Hono): Katalog-Sync, Cardmarket-Snapshots in Chunks, Alarm-Auswertung, Hash-Index-Build | ADR-002; Pro-Plan vorhanden. |
+| Statische Seiten | Vercel (Datenschutz, Impressum, Landingpage) | |
+| Geteilte Verträge | `packages/shared` (Zod + JSON-Schema) → **generierte Swift-Typen** (z. B. quicktype) im CI | Eine Quelle für Typen in TS und Swift. |
+| Berechnete Werte | Postgres-Views/RPCs (Preis-Δ, Portfolio-Historie, Winner/Loser, Grading-ROI) | Logik nur einmal, Client zeigt an. |
+| Matcher | dHash/pHash in Swift (Client) **und** TypeScript (Worker, Index-Bau); gemeinsame Testvektoren `fixtures/hash-vectors.json` | Beide Implementierungen müssen identische Hashes liefern. |
+| Charts | Swift Charts | Eingebaut. |
+| Monorepo | pnpm workspaces + Turborepo für TS-Teile; `apps/apple` daneben mit Xcode-Projekt | |
+| CI | GitHub Actions (Linux) für TS; **Xcode Cloud** (25 h/Monat im Developer Program) für Swift-Build/Tests/TestFlight | macOS-Runner bei GitHub sind teuer. |
+| Distribution | iOS: TestFlight → App Store. macOS: notarisierter Download (Sparkle-Updates) oder Mac App Store | |
 
 ## Repo-Struktur
 
 ```
 .
 ├── apps/
-│   ├── mobile/            # Expo-App (iOS; Web-Build für Desktop)
-│   ├── desktop/           # Tauri-Shell + Scanner-Bridge (Rust), lädt apps/mobile Web-Build
-│   └── worker/            # Cron-Jobs + HTTP-Endpoints (Hono)
+│   ├── apple/             # Xcode-Projekt: Targets iOS + macOS + Widget-Extension
+│   │   ├── PokeVault/     # App (SwiftUI, plattformspezifische Views in iOS/ und macOS/)
+│   │   └── PokeVaultKit/  # Swift-Package: Modelle, Sync, Matcher, Segmentierung, Tests
+│   └── worker/            # Vercel: Cron-Jobs + HTTP-Endpoints (Hono, TypeScript)
 ├── packages/
-│   ├── shared/            # Zod-Schemas, Domain-Typen, Konstanten (Zustände, Sprachen, Varianten)
-│   ├── db/                # Drizzle-Schema, Migrationen (Supabase), generierte Typen
-│   ├── pricing/           # Preis-Provider-Interface + Implementierungen (tcgdex, pricecharting, …)
-│   ├── card-matcher/      # Hashing, Matching-Logik (reines TS, plattformneutral, testbar)
-│   └── ui/                # Design-System (Tokens, Komponenten)
+│   ├── shared/            # Zod-Schemas, Konstanten (Zustände, Sprachen, Varianten) → Swift-Codegen
+│   ├── db/                # Drizzle-Schema, generierte Typen
+│   ├── pricing/           # Preis-Provider-Interface + Implementierungen (cardmarket, tcgplayer, …)
+│   └── card-matcher/      # Hashing + Index-Bau in TS (Worker); Testvektoren für Swift
+├── fixtures/              # Hash-Testvektoren, Beispielscans, Beispielfotos
 ├── supabase/              # config, migrations (SQL), seed
 ├── docs/
 ├── .claude/               # geteilte Claude-Code-Settings, Commands, Skills
@@ -55,16 +46,16 @@
 
 ```mermaid
 flowchart LR
-  subgraph Desktop[Windows / macOS]
-    DApp[Tauri: Expo-Web-Build]
-    Scan[Scanner-Bridge eSCL]
+  subgraph Mac[macOS-App]
+    DApp[SwiftUI + PokeVaultKit]
+    Scan[ImageCaptureCore]
     DApp --- Scan
     Scan --> Flatbed[(Flachbett-Scanner)]
   end
-  subgraph Device[iPhone]
-    App[Expo App]
-    LocalDB[(SQLite)]
-    Cam[Vision Camera + Matcher]
+  subgraph Device[iOS-App]
+    App[SwiftUI + PokeVaultKit]
+    LocalDB[(GRDB / SQLite)]
+    Cam[AVFoundation + Vision + Matcher]
     LA[Live Activity / Widgets]
     App --- LocalDB
     App --- Cam
@@ -75,10 +66,11 @@ flowchart LR
     Auth[Auth]
     Store[Storage: Nutzerfotos, Hash-Index]
   end
-  subgraph Worker[Worker Service]
+  subgraph Worker[Vercel]
     Cron[Cron: Katalog, Preise, Alarme]
     HTTP[Hono API: Match-Fallback, eBay, Reports]
   end
+  DApp <-->|Realtime| PG
   TCGdex[(TCGdex API)]
   CM[(Cardmarket Price Guide Download)]
   Graded[(Scrydex / PriceCharting)]
@@ -125,7 +117,7 @@ ebay_connections     (user_id, refresh_token enc, policies, location_key)
 Regeln:
 - **Alle Geldbeträge als `numeric(12,2)` + Währungsspalte**, nie float.
 - `collection_items` ist die einzige Wahrheit für "was besitze ich". Alles andere (Portfolio, Master-Set-Fortschritt, Winner/Loser) wird abgeleitet.
-- Lokale SQLite spiegelt `collection_items`, `wishlist_items`, `binders` (Offline). Sync über `updated_at` + Soft-Delete (`deleted_at`), Konfliktlösung "last write wins" pro Zeile.
+- Lokale SQLite (GRDB) spiegelt `collection_items`, `sealed_items`, `wishlist_items`, `binders`, `sales`. Sync nach ADR-004: Outbox + Delta-Pull über `updated_at` + Soft-Delete, Realtime für Sofort-Updates, Last-Write-Wins pro Zeile.
 
 ## Scanner-Pipeline
 
@@ -138,16 +130,16 @@ Frame → Karten-Detektion (Rechteck, 63×88 mm Ratio) → Perspektiv-Korrektur 
      → Konfidenz ≥ Schwelle: Auto-Add (Bulk) bzw. Vorschlag (Einzel); sonst Review-Queue mit Top-3
 ```
 
-- **Hash-Index** wird im Worker aus den TCGdex-Bildern gebaut (pro Sprache!) und als komprimierte Datei über Storage ausgeliefert; die App lädt die Sprachen, die der Nutzer aktiviert hat. ~30k Karten × 2 Hashes × 8 Byte ≈ 0,5 MB pro Sprache.
-- **Bulk/Video-Modus:** Frame-Prozessor läuft mit ~10 fps; ein Match gilt erst als stabil, wenn er in 3 aufeinanderfolgenden Frames identisch ist; danach Cooldown, bis ein anderer Hash erscheint. Haptisches Feedback + Chip-Liste oben, Undo per Swipe.
+- **Hash-Index** wird im Worker (TS) aus den TCGdex-Bildern gebaut (pro Sprache!) und als komprimierte Datei über Storage ausgeliefert; die App lädt die Sprachen, die der Nutzer aktiviert hat. Der Client hasht in Swift; beide Implementierungen werden gegen `fixtures/hash-vectors.json` getestet. ~30k Karten × 2 Hashes × 8 Byte ≈ 0,5 MB pro Sprache.
+- **Bulk/Video-Modus:** AVCaptureVideoDataOutput mit ~10 fps; ein Match gilt erst als stabil, wenn er in 3 aufeinanderfolgenden Frames identisch ist; danach Cooldown, bis ein anderer Hash erscheint. Haptisches Feedback + Chip-Liste oben, Undo per Swipe.
 - **Reverse Holo vs. Normal** ist per Hash schwer zu unterscheiden → Nutzer wählt Variante per Toggle (Default merkbar), später Glanz-Heuristik.
-- **Fallback:** Bei Konfidenz unter Schwelle kann das Bild (opt-in) an den Worker geschickt werden, der mit einem Embedding-Modell (z. B. CLIP/DINOv2-Small) sucht. Erst ab Phase 3.
+- **Fallback:** Bei Konfidenz unter Schwelle kann das Bild (opt-in) an den Worker geschickt werden, der mit einem Embedding-Modell sucht; alternativ ein kleines CoreML-Embedding-Modell on-device. Erst ab Phase 3.
 - **Flachbett-Pfad (Desktop):** Scan → Segmentierung in Einzelkarten (Rechtecke mit 63:88) → Rotation → derselbe Hash/OCR-Match wie oben, nur ohne Perspektiv-Korrektur und mit höherer Trefferquote. Details ADR-003.
 - **Vorbild-Projekte:** Open-Source-Scanner mit pHash + Hamming-Distanz (jslok/card-scanner, 1vcian/Pokemon-TCGP-Card-Scanner, em4go/PokeCard-TCG-detector) zeigen, dass der Ansatz funktioniert.
 
 ## Live Activity / Dynamic Island
 
-- Swift-Widget-Extension über Expo Config Plugin (`expo-live-activity` oder eigenes Modul).
+- Widget-Extension-Target im Xcode-Projekt (ActivityKit + WidgetKit), Daten über App Group.
 - Inhalte: Portfolio-Wert + 24h-Δ, laufende Scan-Session (Anzahl erkannt), aktiver Preisalarm.
 - Wählbares Pokémon-Icon: kuratiertes Icon-Set (eigene Illustrationen/Pixel-Art, **nicht** offizielle Artworks) im Extension-Bundle, per App Group als Auswahl gespeichert.
 - Grenzen: max. 8 h aktiv, Nutzer kann Live Activities deaktivieren, 30 MB Speicher-Limit in der Extension, nur ein Live Activity gleichzeitig sichtbar in der Island.

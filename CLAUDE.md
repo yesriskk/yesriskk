@@ -13,9 +13,10 @@ Planungsphase. Es gibt noch keinen Code. Lies vor jeder Arbeit:
 ## Geplanter Stack (siehe ADR-001/002)
 
 - Ziele: iOS-App und macOS-App, pro Nutzer synchron (ADR-004). Android/Windows sind keine Ziele.
-- Clients: ADR-001 offen zwischen nativem Swift (empfohlen; ein Xcode-Projekt, `apps/apple`, Domänen-Package `PokeVaultKit`) und Expo + Tauri. Bis zur Entscheidung keinen Client-Code anlegen.
+- Clients (ADR-001, angenommen): natives Swift. Ein Xcode-Projekt in `apps/apple` mit Targets iOS 17+, macOS 14+ und Widget-Extension; Domänenlogik im Swift-Package `PokeVaultKit` (GRDB, Sync, Matcher, Segmentierung). Kamera über AVFoundation + Vision, Scanner über ImageCaptureCore (ADR-003).
 - Backend (ADR-002, angenommen): Supabase in bestehender Org, Region EU, RLS überall. Worker als TypeScript auf Vercel Cron (`apps/worker`). Statische Seiten auf Vercel.
-- Monorepo: pnpm workspaces + Turborepo für `apps/worker`, `packages/{shared,db,pricing,card-matcher}`, `supabase/`; Apple-Code daneben in `apps/apple`.
+- Monorepo: pnpm workspaces + Turborepo für `apps/worker`, `packages/{shared,db,pricing,card-matcher}`, `supabase/`; Apple-Code daneben in `apps/apple`. Typen aus `packages/shared` werden nach Swift generiert, nie von Hand dupliziert.
+- Berechnungen (Preis-Δ, Portfolio-Historie, Winner/Loser, Grading-ROI) leben als Postgres-Views/RPCs, nicht im Client.
 - Lokaler Cache im Client (SQLite) + Outbox + Supabase Realtime, Last-Write-Wins über `updated_at`.
 
 ## Konventionen
@@ -26,9 +27,16 @@ Planungsphase. Es gibt noch keinen Code. Lies vor jeder Arbeit:
 - Zustände nach Cardmarket-Skala: `MT, NM, EX, GD, LP, PL, PO`. Varianten: `normal, reverse, holo, firstEdition, …` aus `packages/shared`.
 - Migrationen: nur über `supabase/migrations/<timestamp>_<name>.sql`, additiv, rückwärtskompatibel. Jede Nutzertabelle bekommt RLS (`user_id = auth.uid()`).
 - Contract-first: Typen/Zod-Schemas, die App und Worker teilen, zuerst in `packages/shared` als eigener kleiner PR.
-- Reine Logik (Matcher, Preis-Δ, P&L) lebt in `packages/*` ohne React-Native-Imports und hat Vitest-Tests.
+- Reine TS-Logik (Index-Bau, Preis-Jobs) lebt in `packages/*` mit Vitest-Tests; Swift-Logik in `PokeVaultKit` mit XCTest. Der Hash-Algorithmus existiert in beiden Sprachen und muss `fixtures/hash-vectors.json` bestehen.
 - Commits: Conventional Commits mit Paket-Scope (`feat(worker): daily price snapshot job`). Kleine PRs (< 400 Zeilen). Squash-Merge auf `main`.
 - Keine Secrets im Repo. `.env.example` pflegen.
+
+## Swift-Konventionen
+
+- SwiftUI, Swift Concurrency (`async/await`), kein Combine für neue Logik.
+- Keine Force-Unwraps (`!`) außerhalb von Tests. Fehler als typisierte `Error`-Enums.
+- Plattform-Code nur hinter `#if os(macOS)` / `#if os(iOS)` in eigenen Dateien, nicht in geteilten Views verstreut.
+- Geld als `Decimal`, nie `Double`.
 
 ## Verboten
 
@@ -42,7 +50,8 @@ Planungsphase. Es gibt noch keinen Code. Lies vor jeder Arbeit:
 
 ```
 pnpm i                 # Install
-pnpm dev               # Expo + Worker lokal
+pnpm dev               # Worker lokal (vercel dev)
+open apps/apple/PokeVault.xcodeproj   # Clients in Xcode
 pnpm lint && pnpm typecheck && pnpm test
 supabase start         # lokale Supabase
 pnpm db:migrate        # Migrationen anwenden

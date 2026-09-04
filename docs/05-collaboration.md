@@ -15,14 +15,19 @@ Das Monorepo ist so geschnitten, dass paralleles Arbeiten selten dieselben Datei
 
 | Paket | Typischer Owner | Regel |
 |---|---|---|
-| `apps/mobile` | Dev A | Screens, Navigation, Kamera |
+| `apps/apple/PokeVault` (App, Views) | Dev A | SwiftUI-Screens, Kamera, Scanner-Fenster, Widgets |
+| `apps/apple/PokeVaultKit` (Package) | gemeinsam, Dev A erster Reviewer | Modelle, Sync, Matcher in Swift; jede Änderung mit XCTest |
 | `apps/worker` | Dev B | Cron, Provider-Orchestrierung, HTTP-Endpoints |
-| `packages/db` | Dev B | Migrationen **nur** über `/new-migration` (Timestamp-Prefix, nie Sequenznummern → keine Kollisionen) |
-| `packages/shared` | gemeinsam | **Contract-first**: Wer ein Feature braucht, das beide Seiten berührt, legt zuerst Zod-Schema/Typ in `shared` an und merged das als eigenen kleinen PR. Danach arbeiten beide gegen den Typ. |
-| `packages/card-matcher`, `packages/pricing` | Dev B (Logik), Dev A (Integration) | reine TS-Pakete mit Unit-Tests, keine RN-Imports |
-| `packages/ui` | Dev A | Komponenten; Dev B nutzt, ändert nur per PR mit Review |
+| `packages/db`, `supabase/` | Dev B | Migrationen **nur** über `/new-migration` (Timestamp-Prefix, nie Sequenznummern → keine Kollisionen); Views/RPCs für berechnete Werte |
+| `packages/shared` | gemeinsam | **Contract-first**: Wer ein Feature braucht, das beide Seiten berührt, legt zuerst Zod-Schema/Typ in `shared` an und merged das als eigenen kleinen PR. Der CI generiert daraus die Swift-Typen. |
+| `packages/card-matcher`, `packages/pricing` | Dev B | reine TS-Pakete mit Unit-Tests |
+| `fixtures/` | gemeinsam | Testvektoren und Beispielbilder, die Swift und TS gemeinsam bestehen müssen |
+
+**Xcode-Projektdatei (`.pbxproj`) ist der klassische Konfliktherd.** Gegenmaßnahmen: Dateien nur über Xcode hinzufügen, kleine PRs, `PokeVaultKit` als Swift-Package (Package.swift statt pbxproj), und bei Konflikt immer die Seite nehmen, die die neuere Datei hinzugefügt hat, dann Projekt in Xcode öffnen und prüfen.
 
 Ownership heißt "erster Reviewer", nicht "nur der darf". Vertikale Features (z. B. Wishlist = Schema + Worker-Alarm + Screen) werden bewusst aufgeteilt: Contract-PR → zwei parallele PRs.
+
+**GitHub:** Das Projekt zieht in eine eigene GitHub-Organisation um, in der beide Owner sind (Name folgt mit dem Projektnamen). Bis dahin bleibt dieses Repo die Planungsablage.
 
 ## 3. Git-Workflow
 
@@ -31,6 +36,7 @@ Ownership heißt "erster Reviewer", nicht "nur der darf". Vertikale Features (z.
 - **Conventional Commits** (`feat(mobile): scanner review queue`). Scope = Paketname.
 - **PR-Pflicht** mit CI grün + 1 Review. Squash-Merge. Kleine PRs (< 400 Zeilen Diff) sind das Ziel; Claude Code neigt zu großen Diffs, also bewusst splitten.
 - Reviewer nutzt `/code-review` in Claude Code als Vor-Review, entscheidet aber selbst.
+- Swift-Format über `swift-format` oder SwiftLint im CI, TS über ESLint/Prettier; beides als Pre-Commit-Hook.
 - Nie `git push --force` auf `main` oder auf Branches des anderen.
 - Jeder arbeitet in eigenem Clone oder **git worktree** pro Branch, damit parallele Claude-Sessions sich nicht die Working Copy zerschießen.
 
@@ -61,7 +67,7 @@ Preis-Snapshots laufen ab Phase 0 **nur in prod**, Staging bekommt eine wöchent
 
 ## 7. Onboarding des Freundes (Checkliste)
 
-1. Repo klonen, `pnpm i`, `supabase start`, `pnpm dev`.
+1. Repo klonen, `pnpm i`, `supabase start`, `pnpm dev`; Xcode öffnen, `apps/apple/PokeVault.xcodeproj`, Scheme iOS oder macOS starten.
 2. `CLAUDE.md`, `docs/00`–`06` lesen, ADRs überfliegen.
 3. Claude Code im Repo öffnen, `/init` **nicht** ausführen (CLAUDE.md existiert schon), stattdessen `/new-screen`-Command ausprobieren.
 4. Ersten kleinen Issue (`good first issue`) per PR abschließen, um den Workflow zu testen.
