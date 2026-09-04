@@ -33,10 +33,11 @@ Was die Dateien **nicht** enthalten: Bilder, lokalisierte Namen, Kartennummer, S
 
 **Verifiziert am 2026-09-04** anhand einer echten `price_guide_6.json`: Struktur, Felder und Datenqualität stehen in `07-cardmarket-price-guide.md`. Kurz: 78.243 Produkte, davon 73.195 Einzelkarten, Preise als `avg/low/trend/avg1/avg7/avg30` plus Reverse-Holo-Spiegel `*-holo`, Erzeugung täglich ~02:45 MESZ.
 
+**Rechtlicher Status der Download-Dateien (Stand 2026-09-04, siehe Abschnitt 8a):** Die Dateien sind für alle Nutzer frei herunterladbar. Die Cardmarket-AGB enthalten aber für die API eine Klausel, nach der die *Darstellung von Karten und Preisen* eine vorherige schriftliche Zustimmung erfordert. Ob diese Klausel auch die Download-Dateien erfasst, ist offen. **Vor einem öffentlichen Release holen wir eine schriftliche Zustimmung von Cardmarket ein** (Entwurf in `docs/09-cardmarket-anfrage.md`). Interne Entwicklung und Snapshot-Sammlung sind davon nicht blockiert.
+
 **Vor Phase 0 noch prüfen (von einem Rechner mit Zugriff auf cardmarket.com):**
-1. Die exakten URLs und Feldnamen auf der Data-Seite verifizieren; die Pfade oben stammen aus Community-Projekten und der News-Ankündigung, nicht aus einem eigenen Abruf.
-2. Die Nutzungsbedingungen auf der Data-Seite lesen (Attribution? kommerzielle Nutzung? Weitergabe?). Cardmarket-Attribution in der App einplanen.
-3. Uhrzeit der täglichen Aktualisierung feststellen und den Snapshot-Job danach terminieren.
+1. Steht auf der Data-Seite ein eigener Nutzungshinweis oder ein Verweis auf die AGB? Text oder Screenshot in `08a` unten ablegen.
+2. Anfrage an Cardmarket absenden (siehe `09`).
 
 **Konsequenz:** Der Cardmarket-Download wird Provider Nr. 1 für EUR-Preise, direkt von der Quelle, inklusive Sealed. TCGdex bleibt Katalog-, Bild- und USD-Quelle sowie EUR-Fallback. Das Preis-Modul bleibt quellenneutral (`price_source`-Spalte).
 
@@ -95,6 +96,22 @@ Eigene Tabelle `graders` + `grader_service_tiers` (Grader, Tier, Preis, max. Dek
 - CGC, BGS (USA, ähnlich über Vermittler).
 - TAG (USA, KI-gestützt, transparent).
 - AP Grading (DE, ab 19,90 €, 5 Werktage), PCA (FR), Pure Grading (EU) – günstiger, geringerer Wiederverkaufs-Aufschlag.
+
+## 8a. Cardmarket-Nutzungsbedingungen: was wir wissen
+
+Quelle: Cardmarket General Terms and Conditions, Abschnitt zur API (Wortlaut aus Suchtreffern, Originalseite aus der Entwicklungsumgebung nicht abrufbar, bitte gegenprüfen):
+
+> "Cardmarket provides registered users with a permanent Access Token which enables access and partly to edit their own inventory data as well as publicly accessible data via an application programming interface (API). […] The API may only be used for managing your own contents. **The presentation of the trading cards and their respective prices require prior written agreement.** The use of the API and the transfer and use of data for any other purpose is prohibited. Access via the API is an additional offer provided by Cardmarket which is exclusively intended to facilitate the use of the online platform."
+
+Aus der Hilfeseite zur API: Bewerbungen für API-Zugang werden derzeit nicht angenommen; kommerzielle App-Entwickler konnten früher auf Anfrage einen "App Key" erhalten; API-Zugangsdaten dürfen nicht an Dritt-Apps weitergegeben werden.
+
+Aus der News-Ankündigung zu den Downloads: Price Guide und Produktkatalog sind "for all users" herunterladbar, der Price Guide täglich, der Katalog bei neuen Releases; die entsprechenden API-Endpunkte wurden mit Einführung der Dateien abgekündigt. Eine eigene Lizenz oder ein expliziter Verwendungszweck für die Dateien wurde in den Suchergebnissen nicht gefunden.
+
+**Bewertung (keine Rechtsberatung):**
+- Die AGB-Klausel bezieht sich wörtlich auf die API. Cardmarket hat die Dateien aber genau als Ersatz für diese API-Endpunkte veröffentlicht; es ist plausibel, dass Cardmarket dieselbe Erwartung an die Nutzung hat.
+- Unabhängig von den AGB gilt in der EU das **Datenbankherstellerrecht** (§§ 87a ff. UrhG, Datenbank-Richtlinie 96/9/EG): Die tägliche Entnahme des gesamten Price Guides ist eine Entnahme eines "wesentlichen Teils" und braucht eine Erlaubnis. Das öffentliche Anbieten zum Download ist ein starkes Indiz für eine konkludente Erlaubnis zum Herunterladen, sagt aber nichts über die Weiterverbreitung in einer App.
+- Marktpraxis: Mehrere Sammler-Apps zeigen "Cardmarket-Preise" an. Ob mit schriftlicher Vereinbarung, ist von außen nicht erkennbar.
+- **Konsequenz:** Wir behandeln die Anzeige von Cardmarket-Preisen in der App als zustimmungspflichtig, bis Cardmarket schriftlich etwas anderes sagt. Bis dahin: entwickeln, Snapshots sammeln, nicht veröffentlichen. Bei Ablehnung: TCGdex-Preise anzeigen (TCGdex trägt dann das Quellenrisiko) oder auf Bezahl-APIs ausweichen; die eigene Historie bleibt erhalten, weil sie gegen `idProduct` gespeichert ist.
 
 ## 8. Rechtliches
 
