@@ -31,7 +31,7 @@ Ziel: Repo, Infrastruktur und der tägliche Preis-Snapshot laufen. **Ab M0 samme
 | Monorepo aufsetzen (pnpm, Turborepo, ESLint, Prettier, TS strict, Vitest) | Dev A | `pnpm lint/test/typecheck` grün |
 | Supabase-Projekt (EU) + lokales Setup (`supabase start`) + Migrations-Workflow | Dev B | erste Migration gemerged |
 | `packages/db`: Schema `cards`, `sets`, `price_snapshots`, `fx_rates` | Dev B | Migration + Drizzle-Typen |
-| Cardmarket-Data-Seite prüfen: URLs, Felder, Nutzungsbedingungen, Update-Uhrzeit (siehe `02-data-sources.md`) | Dev B | Notiz in `02-data-sources.md` |
+| Cardmarket-Data-Seite prüfen: Nutzungsbedingungen, Produktkatalog-Felder (Price-Guide-Schema ist bereits verifiziert, siehe `07-cardmarket-price-guide.md`) | Dev B | Notiz in `07-cardmarket-price-guide.md` |
 | `apps/worker`: TCGdex-Katalog-Import (alle Sprachen) + Cardmarket-Produktkatalog-Import | Dev B | ~20k Karten + Cardmarket-Produkte in DB |
 | `apps/worker`: ID-Mapping Cardmarket ↔ TCGdex (Expansion + Nummer aus Produktname), Abdeckung messen | Dev B | ≥ 90 % automatisch gemappt, Rest in Review-Tabelle |
 | `apps/worker`: täglicher Preis-Snapshot-Job (Cardmarket-Download + TCGdex) + Rohdatei-Archiv + FX-Job, Deploy auf Fly.io, Alerting bei Fehlschlag | Dev B | Cron läuft in Prod |

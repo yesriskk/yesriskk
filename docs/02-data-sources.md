@@ -25,13 +25,15 @@ Stand der Recherche: September 2026. Bitte vor Phase 0 nochmal gegenprüfen, API
 
 | Datei | Inhalt |
 |---|---|
-| `downloads.s3.cardmarket.com/productCatalog/priceGuide/price_guide_6.json` (auch als CSV) | Täglicher Price Guide: pro `idProduct` `avg`, `low`, `trend`, `avg1`, `avg7`, `avg30` sowie dieselben Werte für die Reverse-Holo-Variante |
+| `downloads.s3.cardmarket.com/productCatalog/priceGuide/price_guide_6.json` (auch als CSV) | Täglicher Price Guide (**verifiziert**): pro `idProduct` `avg`, `low`, `trend`, `avg1`, `avg7`, `avg30` sowie dieselben Werte für die Reverse-Holo-Variante als `*-holo`; `avg1/7/30` nur bei Einzelkarten |
 | `downloads.s3.cardmarket.com/productCatalog/productList/products_singles_6.json` | Alle Einzelkarten: `idProduct`, `name`, `idCategory`, `idExpansion`, `idMetacard`, `dateAdded` |
 | `downloads.s3.cardmarket.com/productCatalog/productList/products_nonsingles_6.json` | Alle Sealed-Produkte (Booster, Displays, ETBs, Tins …) |
 
 Was die Dateien **nicht** enthalten: Bilder, lokalisierte Namen, Kartennummer als eigenes Feld (steckt aber im Produktnamen, z. B. "Charizard ex (OBF 125)"), Preise nach Zustand oder Sprache, Verkaufszahlen, Historie über den 30-Tage-Schnitt hinaus.
 
-**Vor Phase 0 prüfen (von einem Rechner mit Zugriff auf cardmarket.com):**
+**Verifiziert am 2026-09-04** anhand einer echten `price_guide_6.json`: Struktur, Felder und Datenqualität stehen in `07-cardmarket-price-guide.md`. Kurz: 78.243 Produkte, davon 73.195 Einzelkarten, Preise als `avg/low/trend/avg1/avg7/avg30` plus Reverse-Holo-Spiegel `*-holo`, Erzeugung täglich ~02:45 MESZ.
+
+**Vor Phase 0 noch prüfen (von einem Rechner mit Zugriff auf cardmarket.com):**
 1. Die exakten URLs und Feldnamen auf der Data-Seite verifizieren; die Pfade oben stammen aus Community-Projekten und der News-Ankündigung, nicht aus einem eigenen Abruf.
 2. Die Nutzungsbedingungen auf der Data-Seite lesen (Attribution? kommerzielle Nutzung? Weitergabe?). Cardmarket-Attribution in der App einplanen.
 3. Uhrzeit der täglichen Aktualisierung feststellen und den Snapshot-Job danach terminieren.
